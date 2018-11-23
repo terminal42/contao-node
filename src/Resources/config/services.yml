@@ -1,0 +1,14 @@
+services:
+    terminal42_node.listener.data_container:
+        class: Terminal42\NodeBundle\EventListener\DataContainerListener
+        public: true
+        arguments:
+            - "@database_connection"
+            - "@contao.framework"
+            - "@session"
+
+    terminal42_node.listener.insert_tags:
+        class: Terminal42\NodeBundle\EventListener\InsertTagsListener
+        public: true
+        arguments:
+            - "@contao.framework"

@@ -1,0 +1,33 @@
+{
+    "name": "terminal42/contao-node",
+    "description": "Node bundle for Contao Open Source CMS",
+    "keywords": ["contao", "node", "content"],
+    "type": "contao-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "terminal42",
+            "homepage": "https://terminal42.ch"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "contao/core-bundle": "^4.4",
+        "codefog/contao-haste": "^4.21"
+    },
+    "require-dev": {
+        "contao/manager-plugin": "^2.0",
+        "friendsofphp/php-cs-fixer": "^2.2"
+    },
+    "conflict": {
+        "contao/manager-plugin": "<2.0 || >=3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Terminal42\\NodeBundle\\": "src/"
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "Terminal42\\NodeBundle\\ContaoManager\\Plugin"
+    }
+}
