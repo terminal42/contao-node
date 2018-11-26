@@ -1,10 +1,24 @@
 services:
+    terminal42_node.manager:
+        class: Terminal42\NodeBundle\NodeManager
+        public: true
+        arguments:
+            - "@contao.framework"
+
+    terminal42_node.listener.content:
+        class: Terminal42\NodeBundle\EventListener\ContentListener
+        public: true
+        arguments:
+            - "@database_connection"
+            - "@contao.framework"
+
     terminal42_node.listener.data_container:
         class: Terminal42\NodeBundle\EventListener\DataContainerListener
         public: true
         arguments:
             - "@database_connection"
             - "@contao.framework"
+            - "@monolog.logger.contao"
             - "@session"
 
     terminal42_node.listener.insert_tags:
@@ -12,3 +26,15 @@ services:
         public: true
         arguments:
             - "@contao.framework"
+            - "@terminal42_node.manager"
+
+    terminal42_node.picker:
+        class: Terminal42\NodeBundle\Picker\NodePickerProvider
+        public: false
+        arguments:
+            - "@knp_menu.factory"
+            - "@router"
+        calls:
+            - [setTokenStorage, ["@security.token_storage"]]
+        tags:
+            - { name: contao.picker_provider, priority: 132 }

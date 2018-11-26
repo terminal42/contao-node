@@ -16,7 +16,9 @@ use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\Image;
@@ -25,9 +27,14 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Terminal42\NodeBundle\Model\NodeModel;
+use Terminal42\NodeBundle\Widget\NodePickerWidget;
 
 class DataContainerListener
 {
@@ -44,6 +51,11 @@ class DataContainerListener
     private $framework;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @var SessionInterface
      */
     private $session;
@@ -51,28 +63,30 @@ class DataContainerListener
     /**
      * DataContainerListener constructor.
      *
-     * @param Connection               $db
+     * @param Connection $db
      * @param ContaoFrameworkInterface $framework
-     * @param SessionInterface         $session
+     * @param LoggerInterface $logger
+     * @param SessionInterface $session
      */
-    public function __construct(Connection $db, ContaoFrameworkInterface $framework, SessionInterface $session)
-    {
+    public function __construct(
+        Connection $db,
+        ContaoFrameworkInterface $framework,
+        LoggerInterface $logger,
+        SessionInterface $session
+    ) {
         $this->db = $db;
         $this->framework = $framework;
+        $this->logger = $logger;
         $this->session = $session;
     }
 
     /**
      * On load callback.
      *
-     * @param DataContainer|null $dc
+     * @param DataContainer $dc
      */
     public function onLoadCallback(DataContainer $dc): void
     {
-        if (null !== $dc && $dc->id) {
-            // @todo – disable the node type if already selected?
-        }
-
         $this->addBreadcrumb($dc);
     }
 
@@ -126,6 +140,37 @@ class DataContainerListener
     }
 
     /**
+     * On "edit" button callback
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     * @param string $table
+     *
+     * @return string
+     */
+    public function onEditButtonCallback($row, $href, $label, $title, $icon, $attributes, $table): string
+    {
+        /**
+         * @var Backend $backendAdapter
+         * @var Image $imageAdapter
+         * @var System $systemAdapter
+         */
+        $backendAdapter = $this->framework->getAdapter(Backend::class);
+        $imageAdapter = $this->framework->getAdapter(Image::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+        if ($row['type'] === NodeModel::TYPE_FOLDER) {
+            return $imageAdapter->getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+        }
+
+        return '<a href="'.$backendAdapter->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$stringUtilAdapter->specialchars($title).'"'.$attributes.'>'.$imageAdapter->getHtml($icon, $label).'</a> ';
+    }
+
+    /**
      * On label callback.
      *
      * @param array              $row
@@ -141,11 +186,13 @@ class DataContainerListener
         /**
          * @var Backend $backendAdapter
          * @var Image $imageAdapter
+         * @var StringUtil $stringUtilAdapter
          * @var System $systemAdapter
          */
         $backendAdapter = $this->framework->getAdapter(Backend::class);
         $imageAdapter = $this->framework->getAdapter(Image::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        $systemAdapter = $this->framework->getAdapter(System::class);
 
         $image = ($row['type'] === NodeModel::TYPE_CONTENT) ? 'articles.svg' : 'folderC.svg';
 
@@ -154,20 +201,138 @@ class DataContainerListener
             return $imageAdapter->getHtml($image, '', $imageAttribute);
         }
 
-        return $imageAdapter->getHtml($image, '', $imageAttribute).' <a href="' . $backendAdapter->addToUrl('nn='.$row['id']) . '" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">' . $label . '</a>';
+        $languages = [];
+        $allLanguages = $systemAdapter->getLanguages();
+
+        // Generate the languages
+        foreach ($stringUtilAdapter->trimsplit(',', $row['languages']) as $language) {
+            $languages[] = $allLanguages[$language];
+        }
+
+        return sprintf(
+            '%s <a href="%s" title="%s">%s</a>%s',
+            $imageAdapter->getHtml($image, '', $imageAttribute),
+            $backendAdapter->addToUrl('nn='.$row['id']),
+            $stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
+            $label,
+            (count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : ''
+        );
     }
 
     /**
      * On languages options callback.
      *
      * @param DataContainer|null $dc
+     *
+     * @return array
      */
-    public function onLanguagesOptionsCallback(): void
+    public function onLanguagesOptionsCallback(): array
     {
         /** @var System $system */
         $system = $this->framework->getAdapter(System::class);
 
         return $system->getLanguages();
+    }
+
+    /**
+     * On execute the post actions.
+     *
+     * @param string        $action
+     * @param DataContainer $dc
+     */
+    public function onExecutePostActions($action, DataContainer $dc): void
+    {
+        if ('reloadNodePickerWidget' === $action) {
+            $this->reloadNodePickerWidget($dc);
+        }
+    }
+
+    /**
+     * Reload the node picker widget.
+     *
+     * @param DataContainer $dc
+     */
+    private function reloadNodePickerWidget(DataContainer $dc): void
+    {
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->framework->getAdapter(Input::class);
+
+        $id = $inputAdapter->get('id');
+        $field = $dc->inputName = $inputAdapter->post('name');
+
+        // Handle the keys in "edit multiple" mode
+        if ('editAll' === $inputAdapter->get('act')) {
+            $id = \preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
+            $field = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
+        }
+
+        $dc->field = $field;
+
+        // The field does not exist
+        if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
+            $this->logger->log(
+                LogLevel::ERROR,
+                \sprintf('Field "%s" does not exist in DCA "%s"', $field, $dc->table),
+                ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]
+            );
+
+            throw new BadRequestHttpException('Bad request');
+        }
+
+        $row = null;
+        $value = null;
+
+        // Load the value
+        if ('overrideAll' !== $inputAdapter->get('act') && $id > 0 && $this->db->getSchemaManager()->tablesExist([$dc->table])) {
+            $row = $this->db->fetchAssoc("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+
+            // The record does not exist
+            if (!$row) {
+                $this->logger->log(
+                    LogLevel::ERROR,
+                    \sprintf('A record with the ID "%s" does not exist in table "%s"', $id, $dc->table),
+                    ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]
+                );
+
+                throw new BadRequestHttpException('Bad request');
+            }
+
+            $value = $row->$field;
+            $dc->activeRecord = $row;
+        }
+
+        // Call the load_callback
+        if (\is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'])) {
+            /** @var System $systemAdapter */
+            $systemAdapter = $this->framework->getAdapter(System::class);
+
+            foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] as $callback) {
+                if (\is_array($callback)) {
+                    $value = $systemAdapter->importStatic($callback[0])->{$callback[1]}($value, $dc);
+                } elseif (\is_callable($callback)) {
+                    $value = $callback($value, $dc);
+                }
+            }
+        }
+
+        // Set the new value
+        $value = $inputAdapter->post('value', true);
+
+        // Convert the selected values
+        if ($value) {
+            /** @var StringUtil $stringUtilAdapter */
+            $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+            $value = $stringUtilAdapter->trimsplit("\t", $value);
+            $value = \serialize($value);
+        }
+
+        /** @var NodePickerWidget $strClass */
+        $strClass = $GLOBALS['BE_FFL']['nodePicker'];
+
+        /** @var NodePickerWidget $objWidget */
+        $objWidget = new $strClass($strClass::getAttributesFromDca($GLOBALS['TL_DCA'][$dc->table]['fields'][$field], $dc->inputName, $value, $field, $dc->table, $dc));
+
+        throw new ResponseException(new Response($objWidget->generate()));
     }
 
     /**
@@ -177,7 +342,7 @@ class DataContainerListener
      *
      * @throws \RuntimeException
      */
-    private function addBreadcrumb(DataContainer $dc)
+    private function addBreadcrumb(DataContainer $dc): void
     {
         /**
          * @var Controller $controllerAdapter

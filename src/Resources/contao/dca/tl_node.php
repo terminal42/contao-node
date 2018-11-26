@@ -56,8 +56,14 @@ $GLOBALS['TL_DCA']['tl_node'] = [
         'operations' => [
             'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['edit'],
-                'href' => 'act=edit',
+                'href' => 'table=tl_content',
                 'icon' => 'edit.svg',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onEditButtonCallback'],
+            ],
+            'editheader' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_node']['editheader'],
+                'href' => 'act=edit',
+                'icon' => 'header.svg',
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['copy'],
@@ -102,12 +108,15 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'autoincrement' => true],
         ],
         'pid' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['pid'],
+            'foreignKey' => 'tl_node.name',
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'sorting' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'tstamp' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['tstamp'],
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'name' => [

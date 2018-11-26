@@ -11,6 +11,8 @@
 namespace Terminal42\NodeBundle\ContentElement;
 
 use Contao\ContentElement;
+use Contao\StringUtil;
+use Contao\System;
 
 class NodesContentElement extends ContentElement
 {
@@ -22,13 +24,26 @@ class NodesContentElement extends ContentElement
     protected $strTemplate = 'ce_nodes';
 
     /**
+     * @var array
+     */
+    protected $nodes;
+
+    /**
      * Display a wildcard in the back end.
      *
      * @return string
      */
     public function generate()
     {
-        // @todo
+        if (count($ids = StringUtil::deserialize($this->objModel->nodes, true)) === 0) {
+            return '';
+        }
+
+        $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
+
+        if (count($this->nodes) === 0) {
+            return '';
+        }
 
         return parent::generate();
     }
@@ -38,5 +53,6 @@ class NodesContentElement extends ContentElement
      */
     protected function compile()
     {
+        $this->Template->nodes = $this->nodes;
     }
 }

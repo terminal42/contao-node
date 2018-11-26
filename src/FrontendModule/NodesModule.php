@@ -10,9 +10,9 @@
 
 namespace Terminal42\NodeBundle\FrontendModule;
 
-use Contao\BackendTemplate;
 use Contao\Module;
-use Patchwork\Utf8;
+use Contao\StringUtil;
+use Contao\System;
 
 class NodesModule extends Module
 {
@@ -24,22 +24,26 @@ class NodesModule extends Module
     protected $strTemplate = 'mod_nodes';
 
     /**
+     * @var array
+     */
+    protected $nodes;
+
+    /**
      * Display a wildcard in the back end.
      *
      * @return string
      */
     public function generate()
     {
-        if (TL_MODE === 'BE') {
-            $template = new BackendTemplate('be_wildcard');
 
-            $template->wildcard = '### '.Utf8::strtoupper($GLOBALS['TL_LANG']['FMD'][$this->type][0]).' ###';
-            $template->title = $this->headline;
-            $template->id = $this->id;
-            $template->link = $this->name;
-            $template->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
+        if (count($ids = StringUtil::deserialize($this->objModel->nodes, true)) === 0) {
+            return '';
+        }
 
-            return $template->parse();
+        $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
+
+        if (count($this->nodes) === 0) {
+            return '';
         }
 
         return parent::generate();
@@ -50,5 +54,6 @@ class NodesModule extends Module
      */
     protected function compile()
     {
+        $this->Template->nodes = $this->nodes;
     }
 }

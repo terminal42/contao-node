@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\StringUtil;
+use Terminal42\NodeBundle\NodeManager;
 
 class InsertTagsListener
 {
@@ -22,13 +24,20 @@ class InsertTagsListener
     private $framework;
 
     /**
+     * @var NodeManager
+     */
+    private $manager;
+
+    /**
      * InsertTagsListener constructor.
      *
      * @param ContaoFrameworkInterface $framework
+     * @param NodeManager              $manager
      */
-    public function __construct(ContaoFrameworkInterface $framework)
+    public function __construct(ContaoFrameworkInterface $framework, NodeManager $manager)
     {
         $this->framework = $framework;
+        $this->manager = $manager;
     }
 
     /**
@@ -40,5 +49,36 @@ class InsertTagsListener
      */
     public function onReplace(string $tag)
     {
+        $chunks = explode('::', $tag);
+
+        if ($chunks[0] === 'insert_node' || $chunks[0] === 'insert_nodes') {
+            return $this->generateNodes($chunks[1]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Generate the nodes
+     *
+     * @param string $ids
+     *
+     * @return string
+     */
+    private function generateNodes(string $ids): string
+    {
+        /** @var StringUtil $stringUtilAdapter */
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+        if (count($ids = $stringUtilAdapter->trimsplit(',', $ids)) === 0) {
+            return '';
+        }
+
+        // Generate a single node
+        if (count($ids) === 1) {
+            return $this->manager->generateSingle((int) $ids[0]);
+        }
+
+        return implode("\n", $this->manager->generateMultiple($ids));
     }
 }
