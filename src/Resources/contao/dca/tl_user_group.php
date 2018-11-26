@@ -9,12 +9,14 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
  * Palettes
  */
 PaletteManipulator::create()
-    ->addLegend('nodemounts_legend', 'pagemounts_legend', PaletteManipulator::POSITION_AFTER)
-    ->addField('nodemounts', 'nodemounts_legend', PaletteManipulator::POSITION_APPEND)
+    ->addLegend('node_legend', 'pagemounts_legend', PaletteManipulator::POSITION_AFTER)
+    ->addField('nodeMounts', 'node_legend', PaletteManipulator::POSITION_APPEND)
+    ->addField('nodePermissions', 'node_legend', PaletteManipulator::POSITION_APPEND)
     ->applyToPalette('default', 'tl_user_group')
 ;
 
 /*
  * Fields
  */
-$GLOBALS['TL_DCA']['tl_user_group']['fields']['nodemounts'] = &$GLOBALS['TL_DCA']['tl_user']['fields']['nodemounts'];
+$GLOBALS['TL_DCA']['tl_user_group']['fields']['nodeMounts'] = &$GLOBALS['TL_DCA']['tl_user']['fields']['nodeMounts'];
+$GLOBALS['TL_DCA']['tl_user_group']['fields']['nodePermissions'] = &$GLOBALS['TL_DCA']['tl_user']['fields']['nodePermissions'];

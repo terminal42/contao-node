@@ -44,4 +44,5 @@ $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['terminal42_node.listener.insert_
 /*
  * User permissions
  */
-$GLOBALS['TL_PERMISSIONS'][] = 'nodemounts';
+$GLOBALS['TL_PERMISSIONS'][] = 'nodeMounts';
+$GLOBALS['TL_PERMISSIONS'][] = 'nodePermissions';

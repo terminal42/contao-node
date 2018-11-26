@@ -64,18 +64,21 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['editheader'],
                 'href' => 'act=edit',
                 'icon' => 'header.svg',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onEditHeaderButtonCallback'],
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['copy'],
                 'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onCopyButtonCallback'],
             ],
             'copyChilds' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['copyChilds'],
                 'href' => 'act=paste&amp;mode=copy&amp;childs=1',
                 'icon' => 'copychilds.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onCopyButtonCallback'],
             ],
             'cut' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['cut'],
@@ -88,6 +91,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onDeleteButtonCallback'],
             ],
             'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['show'],

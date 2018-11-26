@@ -13,4 +13,4 @@
 /*
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_user_group']['name_legend'] = &$GLOBALS['TL_LANG']['tl_user']['name_legend'];
+$GLOBALS['TL_LANG']['tl_user_group']['node_legend'] = &$GLOBALS['TL_LANG']['tl_user']['node_legend'];

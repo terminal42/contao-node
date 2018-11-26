@@ -3,9 +3,9 @@
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Doctrine\DBAL\Connection;
 use Terminal42\NodeBundle\Model\NodeModel;
+use Terminal42\NodeBundle\PermissionChecker;
 
 class ContentListener
 {
@@ -15,20 +15,19 @@ class ContentListener
     private $db;
 
     /**
-     * @var ContaoFrameworkInterface
+     * @var PermissionChecker
      */
-    private $framework;
+    private $permissionChecker;
 
     /**
      * ContentListener constructor.
      *
-     * @param Connection               $db
-     * @param ContaoFrameworkInterface $framework
+     * @param Connection $db
+     * @param PermissionChecker $permissionChecker
      */
-    public function __construct(Connection $db, ContaoFrameworkInterface $framework)
-    {
+    public function __construct(Connection $db, PermissionChecker $permissionChecker) {
         $this->db = $db;
-        $this->framework = $framework;
+        $this->permissionChecker = $permissionChecker;
     }
 
     /**
@@ -41,6 +40,22 @@ class ContentListener
         // Throw an exception if the node is not present or is of a folder type
         if (!$node || $node === NodeModel::TYPE_FOLDER) {
             throw new AccessDeniedException('Node of folder type cannot have content elements');
+        }
+
+        $this->checkPermissions();
+    }
+
+    /**
+     * Check the permissions
+     */
+    private function checkPermissions(): void
+    {
+        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT)) {
+            throw new AccessDeniedException('The user is not allowed to manage the node content');
+        }
+
+        if (!$this->permissionChecker->isUserAllowedNode(CURRENT_ID)) {
+            throw new AccessDeniedException(sprintf('The user is not allowed to manage the content of node ID %s', CURRENT_ID));
         }
     }
 }

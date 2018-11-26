@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Terminal42\NodeBundle\Model\NodeModel;
+use Terminal42\NodeBundle\PermissionChecker;
 use Terminal42\NodeBundle\Widget\NodePickerWidget;
 
 class DataContainerListener
@@ -56,6 +57,11 @@ class DataContainerListener
     private $logger;
 
     /**
+     * @var PermissionChecker
+     */
+    private $permissionChecker;
+
+    /**
      * @var SessionInterface
      */
     private $session;
@@ -66,17 +72,20 @@ class DataContainerListener
      * @param Connection $db
      * @param ContaoFrameworkInterface $framework
      * @param LoggerInterface $logger
+     * @param PermissionChecker $permissionChecker
      * @param SessionInterface $session
      */
     public function __construct(
         Connection $db,
         ContaoFrameworkInterface $framework,
         LoggerInterface $logger,
+        PermissionChecker $permissionChecker,
         SessionInterface $session
     ) {
         $this->db = $db;
         $this->framework = $framework;
         $this->logger = $logger;
+        $this->permissionChecker = $permissionChecker;
         $this->session = $session;
     }
 
@@ -88,6 +97,8 @@ class DataContainerListener
     public function onLoadCallback(DataContainer $dc): void
     {
         $this->addBreadcrumb($dc);
+        $this->checkPermissions($dc);
+        $this->toggleSwitchToEditFlag($dc);
     }
 
     /**
@@ -148,26 +159,63 @@ class DataContainerListener
      * @param string $title
      * @param string $icon
      * @param string $attributes
-     * @param string $table
      *
      * @return string
      */
-    public function onEditButtonCallback($row, $href, $label, $title, $icon, $attributes, $table): string
+    public function onEditButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
-        /**
-         * @var Backend $backendAdapter
-         * @var Image $imageAdapter
-         * @var System $systemAdapter
-         */
-        $backendAdapter = $this->framework->getAdapter(Backend::class);
-        $imageAdapter = $this->framework->getAdapter(Image::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $row['type'] !== NodeModel::TYPE_FOLDER && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT));
+    }
 
-        if ($row['type'] === NodeModel::TYPE_FOLDER) {
-            return $imageAdapter->getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
-        }
+    /**
+     * On "edit header" button callback
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     *
+     * @return string
+     */
+    public function onEditHeaderButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    {
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_EDIT));
+    }
 
-        return '<a href="'.$backendAdapter->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$stringUtilAdapter->specialchars($title).'"'.$attributes.'>'.$imageAdapter->getHtml($icon, $label).'</a> ';
+    /**
+     * On "copy" button callback
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     *
+     * @return string
+     */
+    public function onCopyButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    {
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE));
+    }
+
+    /**
+     * On "delete" button callback
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     *
+     * @return string
+     */
+    public function onDeleteButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    {
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE));
     }
 
     /**
@@ -245,6 +293,38 @@ class DataContainerListener
         if ('reloadNodePickerWidget' === $action) {
             $this->reloadNodePickerWidget($dc);
         }
+    }
+
+    /**
+     * Generate the button
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     * @param bool   $active
+     *
+     * @return string
+     */
+    private function generateButton(array $row, string $href, string $label, string $title, string $icon, string $attributes, bool $active): string
+    {
+        /** @var Image $imageAdapter */
+        $imageAdapter = $this->framework->getAdapter(Image::class);
+
+        if (!$active) {
+            return $imageAdapter->getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+        }
+
+        /**
+         * @var Backend $backendAdapter
+         * @var StringUtil $stringUtilAdapter
+         */
+        $backendAdapter = $this->framework->getAdapter(Backend::class);
+        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+        return '<a href="'.$backendAdapter->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$stringUtilAdapter->specialchars($title).'"'.$attributes.'>'.$imageAdapter->getHtml($icon, $label).'</a> ';
     }
 
     /**
@@ -336,6 +416,99 @@ class DataContainerListener
     }
 
     /**
+     * Toggle switchToEdit flag
+     *
+     * @param DataContainer $dc
+     */
+    private function toggleSwitchToEditFlag(DataContainer $dc): void
+    {
+        if (!$dc->id || !$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT)) {
+            return;
+        }
+
+        $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
+
+        if ($type === NodeModel::TYPE_CONTENT) {
+            $GLOBALS['TL_DCA'][$dc->table]['config']['switchToEdit'] = true;
+        }
+    }
+
+    /**
+     * Check the permissions
+     *
+     * @param DataContainer $dc
+     */
+    private function checkPermissions(DataContainer $dc): void
+    {
+        if ($this->permissionChecker->isUserAdmin() || null === ($roots = $this->permissionChecker->getUserAllowedRoots())) {
+            return;
+        }
+
+        // Close the table if user is not allowed to create new records
+        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE)) {
+            $GLOBALS['TL_DCA'][$dc->table]['config']['closed'] = true;
+            $GLOBALS['TL_DCA'][$dc->table]['config']['notCopyable'] = true;
+        }
+
+        // Set the flag if user is not allowed to edit records
+        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_EDIT)) {
+            $GLOBALS['TL_DCA'][$dc->table]['config']['notEditable'] = true;
+        }
+
+        // Set the flag if user is not allowed to delete records
+        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE)) {
+            $GLOBALS['TL_DCA'][$dc->table]['config']['notDeletable'] = true;
+        }
+
+        // Limit the allowed roots for the user
+        if (isset($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
+            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
+        } else {
+            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;
+        }
+
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->framework->getAdapter(Input::class);
+
+        // Check current action
+        switch ($action = $inputAdapter->get('act')) {
+            case 'edit':
+                $nodeId = (int) $inputAdapter->get('id');
+
+                // Dynamically add the record to the user profile
+                if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
+                    /** @var \Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface $sessionBag */
+                    $sessionBag = $this->session->getbag('contao_backend');
+
+                    $newRecords = $sessionBag->get('new_records');
+                    $newRecords = \is_array($newRecords[$dc->table]) ? \array_map('intval', $newRecords[$dc->table]) : [];
+
+                    if (\in_array($nodeId, $newRecords, true)) {
+                        $this->permissionChecker->addNodeToAllowedRoots($nodeId);
+                    }
+                }
+            // no break;
+
+            case 'copy':
+            case 'delete':
+            case 'show':
+                $nodeId = $nodeId ?? (int) $inputAdapter->get('id');
+
+                if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
+                    throw new AccessDeniedException(\sprintf('Not enough permissions to %s news category ID %s.', $action, $nodeId));
+                }
+                break;
+            case 'editAll':
+            case 'deleteAll':
+            case 'overrideAll':
+                $session = $this->session->all();
+                $session['CURRENT']['IDS'] = \array_intersect($session['CURRENT']['IDS'], $roots);
+                $this->session->replace($session);
+                break;
+        }
+    }
+
+    /**
      * Add a breadcrumb menu
      *
      * @param DataContainer $dc
@@ -422,7 +595,7 @@ class DataContainerListener
                 }
 
                 // Do not show the mounted nodes
-                if (!$user->isAdmin && $user->hasAccess($node['id'], 'nodemounts')) {
+                if (!$user->isAdmin && $user->hasAccess($node['id'], 'nodeMounts')) {
                     break;
                 }
 
@@ -431,7 +604,7 @@ class DataContainerListener
         }
 
         // Check whether the node is mounted
-        if (!$user->hasAccess($ids, 'nodemounts')) {
+        if (!$user->hasAccess($ids, 'nodeMounts')) {
             $session->set(self::BREADCRUMB_SESSION_KEY, 0);
             throw new AccessDeniedException('Node ID ' . $nodeId . ' is not mounted.');
         }
