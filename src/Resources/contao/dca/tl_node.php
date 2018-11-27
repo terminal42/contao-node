@@ -78,7 +78,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 'href' => 'act=paste&amp;mode=copy&amp;childs=1',
                 'icon' => 'copychilds.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'button_callback' => ['terminal42_node.listener.data_container', 'onCopyButtonCallback'],
+                'button_callback' => ['terminal42_node.listener.data_container', 'onCopyChildsButtonCallback'],
             ],
             'cut' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['cut'],

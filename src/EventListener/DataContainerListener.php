@@ -133,8 +133,13 @@ class DataContainerListener
         }
 
         // Disable paste into if the node is of content type
-        if ($row['type'] === NodeModel::TYPE_CONTENT) {
+        if (!$disablePI && $row['type'] === NodeModel::TYPE_CONTENT) {
             $disablePI = true;
+        }
+
+        // Disable "paste after" button if the parent node is a root node and the user is not allowed
+        if (!$disablePA && !$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT) && (!$row['pid'] || (\in_array((int) $row['id'], $dc->rootIds, true)))) {
+            $disablePA = true;
         }
 
         $return = '';
@@ -193,12 +198,46 @@ class DataContainerListener
      * @param string $title
      * @param string $icon
      * @param string $attributes
+     * @param string $table
      *
      * @return string
      */
-    public function onCopyButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    public function onCopyButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
     {
+        if ($GLOBALS['TL_DCA'][$table]['config']['closed']) {
+            return '';
+        }
+
         return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE));
+    }
+
+    /**
+     * On "copy childs" button callback
+     *
+     * @param array  $row
+     * @param string $href
+     * @param string $label
+     * @param string $title
+     * @param string $icon
+     * @param string $attributes
+     * @param string $table
+     *
+     * @return string
+     */
+    public function onCopyChildsButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
+    {
+        if ($GLOBALS['TL_DCA'][$table]['config']['closed']) {
+            return '';
+        }
+
+        $active = ($row['type'] === NodeModel::TYPE_FOLDER) && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE);
+
+        // Make the button active only if there are subnodes
+        if ($active) {
+            $active = $this->db->fetchColumn("SELECT COUNT(*) FROM $table WHERE pid=?", [$row['id']]) > 0;
+        }
+
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
     }
 
     /**
@@ -215,7 +254,20 @@ class DataContainerListener
      */
     public function onDeleteButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE));
+        $active = true;
+
+        // Allow delete if the user has permission
+        if (!$this->permissionChecker->isUserAdmin()) {
+            $rootIds = (array) func_get_arg(7);
+            $active = $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE);
+
+            // If the node is a root one, check if the user has permission to manage it
+            if ($active && \in_array((int) $row['id'], $rootIds, true)) {
+                $active = $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT);
+            }
+        }
+
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
     }
 
     /**
@@ -440,9 +492,12 @@ class DataContainerListener
      */
     private function checkPermissions(DataContainer $dc): void
     {
-        if ($this->permissionChecker->isUserAdmin() || null === ($roots = $this->permissionChecker->getUserAllowedRoots())) {
+        if ($this->permissionChecker->isUserAdmin()) {
             return;
         }
+
+        /** @var Input $inputAdapter */
+        $inputAdapter = $this->framework->getAdapter(Input::class);
 
         // Close the table if user is not allowed to create new records
         if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE)) {
@@ -460,51 +515,73 @@ class DataContainerListener
             $GLOBALS['TL_DCA'][$dc->table]['config']['notDeletable'] = true;
         }
 
-        // Limit the allowed roots for the user
-        if (isset($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
-            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
-        } else {
-            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;
+        $session = $this->session->all();
+
+        // Filter allowed page IDs
+        if (is_array($session['CURRENT']['IDS'])) {
+            $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
+                $session['CURRENT']['IDS'],
+                ($inputAdapter->get('act') === 'deleteAll') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
+            );
+
+            $this->session->replace($session);
         }
 
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
+        // Limit the allowed roots for the user
+        if (null !== ($roots = $this->permissionChecker->getUserAllowedRoots())) {
+            if (isset($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
+                $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
+            } else {
+                $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;
+            }
 
-        // Check current action
-        switch ($action = $inputAdapter->get('act')) {
-            case 'edit':
-                $nodeId = (int) $inputAdapter->get('id');
+            // Allow root paste if the user has enough permission
+            if ($this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT)) {
+                $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['rootPaste'] = true;
+            }
 
-                // Dynamically add the record to the user profile
-                if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                    /** @var \Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface $sessionBag */
-                    $sessionBag = $this->session->getbag('contao_backend');
+            // Check current action
+            if (($action = $inputAdapter->get('act')) && $action !== 'paste') {
+                switch ($action) {
+                    case 'edit':
+                        $nodeId = (int) $inputAdapter->get('id');
 
-                    $newRecords = $sessionBag->get('new_records');
-                    $newRecords = \is_array($newRecords[$dc->table]) ? \array_map('intval', $newRecords[$dc->table]) : [];
+                        // Dynamically add the record to the user profile
+                        if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
+                            /** @var \Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface $sessionBag */
+                            $sessionBag = $this->session->getbag('contao_backend');
 
-                    if (\in_array($nodeId, $newRecords, true)) {
-                        $this->permissionChecker->addNodeToAllowedRoots($nodeId);
-                    }
+                            $newRecords = $sessionBag->get('new_records');
+                            $newRecords = \is_array($newRecords[$dc->table]) ? \array_map('intval', $newRecords[$dc->table]) : [];
+
+                            if (\in_array($nodeId, $newRecords, true)) {
+                                $this->permissionChecker->addNodeToAllowedRoots($nodeId);
+                            }
+                        }
+                    // no break;
+
+                    case 'copy':
+                    case 'delete':
+                    case 'show':
+                        if (!isset($nodeId)) {
+                            $nodeId = (int) $inputAdapter->get('id');
+                        }
+
+                        if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
+                            throw new AccessDeniedException(\sprintf('Not enough permissions to %s news category ID %s.', $action, $nodeId));
+                        }
+                        break;
+
+                    case 'editAll':
+                    case 'deleteAll':
+                    case 'overrideAll':
+                        if (is_array($session['CURRENT']['IDS'])) {
+                            $session['CURRENT']['IDS'] = \array_intersect($session['CURRENT']['IDS'], $roots);
+                            $this->session->replace($session);
+                        }
+                        break;
                 }
-            // no break;
-
-            case 'copy':
-            case 'delete':
-            case 'show':
-                $nodeId = $nodeId ?? (int) $inputAdapter->get('id');
-
-                if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                    throw new AccessDeniedException(\sprintf('Not enough permissions to %s news category ID %s.', $action, $nodeId));
-                }
-                break;
-            case 'editAll':
-            case 'deleteAll':
-            case 'overrideAll':
-                $session = $this->session->all();
-                $session['CURRENT']['IDS'] = \array_intersect($session['CURRENT']['IDS'], $roots);
-                $this->session->replace($session);
-                break;
+            }
         }
     }
 

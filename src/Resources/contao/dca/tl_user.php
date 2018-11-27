@@ -33,6 +33,7 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['nodePermissions'] = [
         \Terminal42\NodeBundle\PermissionChecker::PERMISSION_EDIT,
         \Terminal42\NodeBundle\PermissionChecker::PERMISSION_DELETE,
         \Terminal42\NodeBundle\PermissionChecker::PERMISSION_CONTENT,
+        \Terminal42\NodeBundle\PermissionChecker::PERMISSION_ROOT,
     ],
     'reference' => &$GLOBALS['TL_LANG']['tl_user']['nodePermissionsRef'],
     'eval' => ['multiple' => true, 'fieldType' => 'checkbox', 'tl_class' => 'clr'],

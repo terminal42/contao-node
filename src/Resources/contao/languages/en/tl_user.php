@@ -19,6 +19,7 @@ $GLOBALS['TL_LANG']['tl_user']['nodePermissionsRef'] = [
     \Terminal42\NodeBundle\PermissionChecker::PERMISSION_EDIT => 'Edit nodes',
     \Terminal42\NodeBundle\PermissionChecker::PERMISSION_DELETE => 'Delete nodes',
     \Terminal42\NodeBundle\PermissionChecker::PERMISSION_CONTENT => 'Manage content',
+    \Terminal42\NodeBundle\PermissionChecker::PERMISSION_ROOT => 'Manage root nodes',
 ];
 
 /*

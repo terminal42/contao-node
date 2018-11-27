@@ -15,6 +15,7 @@ class PermissionChecker
     const PERMISSION_EDIT = 'edit';
     const PERMISSION_CONTENT = 'content';
     const PERMISSION_DELETE = 'delete';
+    const PERMISSION_ROOT = 'root';
 
     /**
      * @var Connection
@@ -30,6 +31,11 @@ class PermissionChecker
      * @var TokenStorageInterface
      */
     private $tokenStorage;
+
+    /**
+     * @var BackendUser
+     */
+    private $user;
 
     /**
      * PermissionChecker constructor.
@@ -108,6 +114,11 @@ class PermissionChecker
             return true;
         }
 
+        // Return true if the node is a root one and user has permission to manage those
+        if (\in_array($nodeId, $roots, true) && $this->hasUserPermission(self::PERMISSION_ROOT)) {
+            return true;
+        }
+
         /** @var Database $db */
         $db = $this->framework->createInstance(Database::class);
 
@@ -167,6 +178,23 @@ class PermissionChecker
     }
 
     /**
+     * Filter the allowed IDs
+     *
+     * @param array  $ids
+     * @param string $permission
+     *
+     * @return array
+     */
+    public function filterAllowedIds(array $ids, string $permission): array
+    {
+        if (count($ids) === 0 || !$this->hasUserPermission($permission)) {
+            return [];
+        }
+
+        return array_filter($ids, [$this, 'isUserAllowedNode']);
+    }
+
+    /**
      * Get the user.
      *
      * @throws \RuntimeException
@@ -175,9 +203,7 @@ class PermissionChecker
      */
     private function getUser()
     {
-        static $user;
-
-        if ($user === null) {
+        if ($this->user === null) {
             if (null === $this->tokenStorage) {
                 throw new \RuntimeException('No token storage provided');
             }
@@ -188,13 +214,13 @@ class PermissionChecker
                 throw new \RuntimeException('No token provided');
             }
 
-            $user = $token->getUser();
+            $this->user = $token->getUser();
 
-            if (!$user instanceof BackendUser) {
+            if (!$this->user instanceof BackendUser) {
                 throw new \RuntimeException('The token does not contain a back end user object');
             }
         }
 
-        return $user;
+        return $this->user;
     }
 }
