@@ -51,7 +51,7 @@ class InsertTagsListener
     {
         $chunks = explode('::', $tag);
 
-        if ($chunks[0] === 'insert_node' || $chunks[0] === 'insert_nodes') {
+        if ('insert_node' === $chunks[0] || 'insert_nodes' === $chunks[0]) {
             return $this->generateNodes($chunks[1]);
         }
 
@@ -59,7 +59,7 @@ class InsertTagsListener
     }
 
     /**
-     * Generate the nodes
+     * Generate the nodes.
      *
      * @param string $ids
      *
@@ -70,12 +70,12 @@ class InsertTagsListener
         /** @var StringUtil $stringUtilAdapter */
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
-        if (count($ids = $stringUtilAdapter->trimsplit(',', $ids)) === 0) {
+        if (0 === \count($ids = $stringUtilAdapter->trimsplit(',', $ids))) {
             return '';
         }
 
         // Generate a single node
-        if (count($ids) === 1) {
+        if (1 === \count($ids)) {
             return $this->manager->generateSingle((int) $ids[0]);
         }
 

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Node Bundle for Contao Open Source CMS.
+ *
+ * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @author     terminal42 <https://terminal42.ch>
+ * @license    MIT
+ */
+
 namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
@@ -26,7 +34,7 @@ class NodeManager
     }
 
     /**
-     * Generate single node
+     * Generate single node.
      *
      * @param int $id
      *
@@ -41,7 +49,7 @@ class NodeManager
         /** @var NodeModel $nodeModelAdapter */
         $nodeModelAdapter = $this->framework->getAdapter(NodeModel::class);
 
-        if (($nodeModel = $nodeModelAdapter->findOneBy(['id=?', 'type=?'], [$id, NodeModel::TYPE_CONTENT])) === null) {
+        if (null === ($nodeModel = $nodeModelAdapter->findOneBy(['id=?', 'type=?'], [$id, NodeModel::TYPE_CONTENT]))) {
             return null;
         }
 
@@ -52,7 +60,7 @@ class NodeManager
     }
 
     /**
-     * Generate multiple nodes
+     * Generate multiple nodes.
      *
      * @param array $ids
      *
@@ -62,7 +70,7 @@ class NodeManager
     {
         $ids = array_filter($ids);
 
-        if (count($ids) === 0) {
+        if (0 === \count($ids)) {
             return [];
         }
 
@@ -70,12 +78,12 @@ class NodeManager
         $nodeModelAdapter = $this->framework->getAdapter(NodeModel::class);
 
         $nodeModels = $nodeModelAdapter->findBy(
-            ['id IN (' . implode(',', $ids) . ')', 'type=?'],
+            ['id IN ('.implode(',', $ids).')', 'type=?'],
             [NodeModel::TYPE_CONTENT, implode(',', $ids)],
             ['order' => 'FIND_IN_SET(`id`, ?)']
         );
 
-        if ($nodeModels === null) {
+        if (null === $nodeModels) {
             return [];
         }
 
@@ -93,7 +101,7 @@ class NodeManager
     }
 
     /**
-     * Generate the node buffer (content elements)
+     * Generate the node buffer (content elements).
      *
      * @param NodeModel          $nodeModel
      * @param Controller|Adapter $controllerAdapter
@@ -104,7 +112,7 @@ class NodeManager
     {
         $buffer = '';
 
-        if (($elements = $nodeModel->getContentElements()) !== null) {
+        if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
             foreach ($elements as $element) {
                 $buffer .= $controllerAdapter->getContentElement($element);

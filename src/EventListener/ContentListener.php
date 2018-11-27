@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Node Bundle for Contao Open Source CMS.
+ *
+ * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @author     terminal42 <https://terminal42.ch>
+ * @license    MIT
+ */
+
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Exception\AccessDeniedException;
@@ -30,9 +38,9 @@ class ContentListener
     /**
      * ContentListener constructor.
      *
-     * @param Connection $db
+     * @param Connection               $db
      * @param ContaoFrameworkInterface $framework
-     * @param PermissionChecker $permissionChecker
+     * @param PermissionChecker        $permissionChecker
      */
     public function __construct(
         Connection $db,
@@ -52,7 +60,7 @@ class ContentListener
         $node = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [CURRENT_ID]);
 
         // Throw an exception if the node is not present or is of a folder type
-        if (!$node || $node === NodeModel::TYPE_FOLDER) {
+        if (!$node || NodeModel::TYPE_FOLDER === $node) {
             throw new AccessDeniedException('Node of folder type cannot have content elements');
         }
 
@@ -65,21 +73,21 @@ class ContentListener
      * @param string        $value
      * @param DataContainer $dc
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function onNodesSaveCallback(string $value, DataContainer $dc): string
     {
         // Check for potential circular reference
-        if ($dc->activeRecord->ptable === 'tl_node') {
+        if ('tl_node' === $dc->activeRecord->ptable) {
             /** @var StringUtil $stringUtilAdapter */
             $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
 
             $ids = (array) $stringUtilAdapter->deserialize($value, true);
             $ids = array_map('intval', $ids);
 
-            if (in_array((int) $dc->activeRecord->pid, $ids, true)) {
+            if (\in_array((int) $dc->activeRecord->pid, $ids, true)) {
                 throw new \InvalidArgumentException($GLOBALS['TL_LANG']['ERR']['circularReference']);
             }
 
@@ -90,7 +98,7 @@ class ContentListener
     }
 
     /**
-     * Check the permissions
+     * Check the permissions.
      */
     private function checkPermissions(): void
     {

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Node Bundle for Contao Open Source CMS.
+ *
+ * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @author     terminal42 <https://terminal42.ch>
+ * @license    MIT
+ */
+
 namespace Terminal42\NodeBundle;
 
 use Contao\BackendUser;
@@ -40,9 +48,9 @@ class PermissionChecker
     /**
      * PermissionChecker constructor.
      *
-     * @param Connection $db
+     * @param Connection               $db
      * @param ContaoFrameworkInterface $framework
-     * @param TokenStorageInterface $tokenStorage
+     * @param TokenStorageInterface    $tokenStorage
      */
     public function __construct(
         Connection $db,
@@ -55,7 +63,7 @@ class PermissionChecker
     }
 
     /**
-     * Return true if the user is admin
+     * Return true if the user is admin.
      *
      * @return bool
      */
@@ -65,7 +73,7 @@ class PermissionChecker
     }
 
     /**
-     * Return true if the user has permission
+     * Return true if the user has permission.
      *
      * @param string $permission
      *
@@ -80,7 +88,7 @@ class PermissionChecker
         $value = $this->getUser()->hasAccess($permission, 'nodePermissions');
 
         // If the user is able to create records, he is automatically able to edit them
-        if (!$value && $permission === self::PERMISSION_EDIT) {
+        if (!$value && self::PERMISSION_EDIT === $permission) {
             return $this->hasUserPermission(self::PERMISSION_CREATE);
         }
 
@@ -151,7 +159,7 @@ class PermissionChecker
             foreach ($groups as $group) {
                 $permissions = $stringUtil->deserialize($group['nodePermissions'], true);
 
-                if (\in_array(PermissionChecker::PERMISSION_CREATE, $permissions, true)) {
+                if (\in_array(self::PERMISSION_CREATE, $permissions, true)) {
                     $nodeIds = (array) $stringUtil->deserialize($group['nodeMounts'], true);
                     $nodeIds[] = $nodeId;
 
@@ -165,7 +173,7 @@ class PermissionChecker
             $userData = $this->db->fetchAssoc('SELECT nodePermissions, nodeMounts FROM tl_user WHERE id=?', [$user->id]);
             $permissions = $stringUtil->deserialize($userData['nodePermissions'], true);
 
-            if (\in_array(PermissionChecker::PERMISSION_CREATE, $permissions, true)) {
+            if (\in_array(self::PERMISSION_CREATE, $permissions, true)) {
                 $nodeIds = (array) $stringUtil->deserialize($userData['nodeMounts'], true);
                 $nodeIds[] = $nodeId;
 
@@ -178,7 +186,7 @@ class PermissionChecker
     }
 
     /**
-     * Filter the allowed IDs
+     * Filter the allowed IDs.
      *
      * @param array  $ids
      * @param string $permission
@@ -187,7 +195,7 @@ class PermissionChecker
      */
     public function filterAllowedIds(array $ids, string $permission): array
     {
-        if (count($ids) === 0 || !$this->hasUserPermission($permission)) {
+        if (0 === \count($ids) || !$this->hasUserPermission($permission)) {
             return [];
         }
 
@@ -203,7 +211,7 @@ class PermissionChecker
      */
     private function getUser()
     {
-        if ($this->user === null) {
+        if (null === $this->user) {
             if (null === $this->tokenStorage) {
                 throw new \RuntimeException('No token storage provided');
             }

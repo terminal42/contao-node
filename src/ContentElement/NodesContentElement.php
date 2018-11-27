@@ -35,14 +35,14 @@ class NodesContentElement extends ContentElement
      */
     public function generate()
     {
-        if (count($ids = StringUtil::deserialize($this->objModel->nodes, true)) === 0) {
+        if (0 === \count($ids = StringUtil::deserialize($this->objModel->nodes, true))) {
             return '';
         }
 
         $ids = array_map('intval', $ids);
 
         // Check for potential circular reference
-        if ($this->objModel->ptable === 'tl_node' && in_array((int) $this->objModel->pid, $ids, true)) {
+        if ('tl_node' === $this->objModel->ptable && \in_array((int) $this->objModel->pid, $ids, true)) {
             if (TL_MODE === 'BE') {
                 return sprintf('<strong class="tl_red">%s</strong>', $GLOBALS['TL_LANG']['ERR']['circularReference']);
             }
@@ -52,7 +52,7 @@ class NodesContentElement extends ContentElement
 
         $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
 
-        if (count($this->nodes) === 0) {
+        if (0 === \count($this->nodes)) {
             return '';
         }
 

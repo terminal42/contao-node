@@ -69,11 +69,11 @@ class DataContainerListener
     /**
      * DataContainerListener constructor.
      *
-     * @param Connection $db
+     * @param Connection               $db
      * @param ContaoFrameworkInterface $framework
-     * @param LoggerInterface $logger
-     * @param PermissionChecker $permissionChecker
-     * @param SessionInterface $session
+     * @param LoggerInterface          $logger
+     * @param PermissionChecker        $permissionChecker
+     * @param SessionInterface         $session
      */
     public function __construct(
         Connection $db,
@@ -102,7 +102,7 @@ class DataContainerListener
     }
 
     /**
-     * On paste button callback
+     * On paste button callback.
      *
      * @param DataContainer $dc
      * @param array         $row
@@ -115,9 +115,9 @@ class DataContainerListener
     public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, $clipboard = null): string
     {
         /**
-         * @var Backend $backendAdapter
-         * @var Image $imageAdapter
-         * @var System $systemAdapter
+         * @var Backend
+         * @var Image   $imageAdapter
+         * @var System  $systemAdapter
          */
         $backendAdapter = $this->framework->getAdapter(Backend::class);
         $imageAdapter = $this->framework->getAdapter(Image::class);
@@ -127,13 +127,13 @@ class DataContainerListener
         $disablePI = false;
 
         // Disable all buttons if there is a circular reference
-        if ($clipboard !== false && (($clipboard['mode'] === 'cut' && ($cr || $clipboard['id'] == $row['id'])) || ($clipboard['mode'] === 'cutAll' && ($cr || \in_array($row['id'], $clipboard['id']))))) {
+        if (false !== $clipboard && (('cut' === $clipboard['mode'] && ($cr || (int) $clipboard['id'] === (int) $row['id'])) || ('cutAll' === $clipboard['mode'] && ($cr || \in_array((int) $row['id'], \array_map('intval', $clipboard['id']), true))))) {
             $disablePA = true;
             $disablePI = true;
         }
 
         // Disable paste into if the node is of content type
-        if (!$disablePI && $row['type'] === NodeModel::TYPE_CONTENT) {
+        if (!$disablePI && NodeModel::TYPE_CONTENT === $row['type']) {
             $disablePI = true;
         }
 
@@ -156,7 +156,7 @@ class DataContainerListener
     }
 
     /**
-     * On "edit" button callback
+     * On "edit" button callback.
      *
      * @param array  $row
      * @param string $href
@@ -169,11 +169,11 @@ class DataContainerListener
      */
     public function onEditButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $row['type'] !== NodeModel::TYPE_FOLDER && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT));
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, NodeModel::TYPE_FOLDER !== $row['type'] && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT));
     }
 
     /**
-     * On "edit header" button callback
+     * On "edit header" button callback.
      *
      * @param array  $row
      * @param string $href
@@ -190,7 +190,7 @@ class DataContainerListener
     }
 
     /**
-     * On "copy" button callback
+     * On "copy" button callback.
      *
      * @param array  $row
      * @param string $href
@@ -212,7 +212,7 @@ class DataContainerListener
     }
 
     /**
-     * On "copy childs" button callback
+     * On "copy childs" button callback.
      *
      * @param array  $row
      * @param string $href
@@ -230,7 +230,7 @@ class DataContainerListener
             return '';
         }
 
-        $active = ($row['type'] === NodeModel::TYPE_FOLDER) && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE);
+        $active = (NodeModel::TYPE_FOLDER === $row['type']) && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE);
 
         // Make the button active only if there are subnodes
         if ($active) {
@@ -241,7 +241,7 @@ class DataContainerListener
     }
 
     /**
-     * On "delete" button callback
+     * On "delete" button callback.
      *
      * @param array  $row
      * @param string $href
@@ -284,17 +284,17 @@ class DataContainerListener
     public function onLabelCallback(array $row, string $label, DataContainer $dc = null, string $imageAttribute = '', bool $returnImage = false): string
     {
         /**
-         * @var Backend $backendAdapter
-         * @var Image $imageAdapter
+         * @var Backend
+         * @var Image      $imageAdapter
          * @var StringUtil $stringUtilAdapter
-         * @var System $systemAdapter
+         * @var System     $systemAdapter
          */
         $backendAdapter = $this->framework->getAdapter(Backend::class);
         $imageAdapter = $this->framework->getAdapter(Image::class);
         $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
         $systemAdapter = $this->framework->getAdapter(System::class);
 
-        $image = ($row['type'] === NodeModel::TYPE_CONTENT) ? 'articles.svg' : 'folderC.svg';
+        $image = (NodeModel::TYPE_CONTENT === $row['type']) ? 'articles.svg' : 'folderC.svg';
 
         // Return the image only
         if ($returnImage) {
@@ -315,7 +315,7 @@ class DataContainerListener
             $backendAdapter->addToUrl('nn='.$row['id']),
             $stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            (count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : ''
+            (\count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : ''
         );
     }
 
@@ -348,7 +348,7 @@ class DataContainerListener
     }
 
     /**
-     * Generate the button
+     * Generate the button.
      *
      * @param array  $row
      * @param string $href
@@ -370,7 +370,7 @@ class DataContainerListener
         }
 
         /**
-         * @var Backend $backendAdapter
+         * @var Backend
          * @var StringUtil $stringUtilAdapter
          */
         $backendAdapter = $this->framework->getAdapter(Backend::class);
@@ -468,7 +468,7 @@ class DataContainerListener
     }
 
     /**
-     * Toggle switchToEdit flag
+     * Toggle switchToEdit flag.
      *
      * @param DataContainer $dc
      */
@@ -480,13 +480,13 @@ class DataContainerListener
 
         $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
 
-        if ($type === NodeModel::TYPE_CONTENT) {
+        if (NodeModel::TYPE_CONTENT === $type) {
             $GLOBALS['TL_DCA'][$dc->table]['config']['switchToEdit'] = true;
         }
     }
 
     /**
-     * Check the permissions
+     * Check the permissions.
      *
      * @param DataContainer $dc
      */
@@ -518,10 +518,10 @@ class DataContainerListener
         $session = $this->session->all();
 
         // Filter allowed page IDs
-        if (is_array($session['CURRENT']['IDS'])) {
+        if (\is_array($session['CURRENT']['IDS'])) {
             $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
                 $session['CURRENT']['IDS'],
-                ($inputAdapter->get('act') === 'deleteAll') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
+                ('deleteAll' === $inputAdapter->get('act')) ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
             );
 
             $this->session->replace($session);
@@ -529,7 +529,7 @@ class DataContainerListener
 
         // Limit the allowed roots for the user
         if (null !== ($roots = $this->permissionChecker->getUserAllowedRoots())) {
-            if (isset($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
+            if (isset($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && \is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
                 $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
             } else {
                 $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;
@@ -541,7 +541,7 @@ class DataContainerListener
             }
 
             // Check current action
-            if (($action = $inputAdapter->get('act')) && $action !== 'paste') {
+            if (($action = $inputAdapter->get('act')) && 'paste' !== $action) {
                 switch ($action) {
                     case 'edit':
                         $nodeId = (int) $inputAdapter->get('id');
@@ -571,11 +571,10 @@ class DataContainerListener
                             throw new AccessDeniedException(\sprintf('Not enough permissions to %s news category ID %s.', $action, $nodeId));
                         }
                         break;
-
                     case 'editAll':
                     case 'deleteAll':
                     case 'overrideAll':
-                        if (is_array($session['CURRENT']['IDS'])) {
+                        if (\is_array($session['CURRENT']['IDS'])) {
                             $session['CURRENT']['IDS'] = \array_intersect($session['CURRENT']['IDS'], $roots);
                             $this->session->replace($session);
                         }
@@ -586,7 +585,7 @@ class DataContainerListener
     }
 
     /**
-     * Add a breadcrumb menu
+     * Add a breadcrumb menu.
      *
      * @param DataContainer $dc
      *
@@ -595,10 +594,10 @@ class DataContainerListener
     private function addBreadcrumb(DataContainer $dc): void
     {
         /**
-         * @var Controller $controllerAdapter
+         * @var Controller
          * @var Environment $environmentAdapter
-         * @var Input $inputAdapter
-         * @var Validator $validatorAdapter
+         * @var Input       $inputAdapter
+         * @var Validator   $validatorAdapter
          */
         $controllerAdapter = $this->framework->getAdapter(Controller::class);
         $environmentAdapter = $this->framework->getAdapter(Environment::class);
@@ -612,7 +611,7 @@ class DataContainerListener
         if (isset($_GET['nn'])) {
             // Check the path
             if ($validatorAdapter->isInsecurePath($inputAdapter->get('nn', true))) {
-                throw new \RuntimeException('Insecure path ' . $inputAdapter->get('nn', true));
+                throw new \RuntimeException('Insecure path '.$inputAdapter->get('nn', true));
             }
 
             $session->set(self::BREADCRUMB_SESSION_KEY, $inputAdapter->get('nn', true));
@@ -625,16 +624,16 @@ class DataContainerListener
 
         // Check the path
         if ($validatorAdapter->isInsecurePath($nodeId)) {
-            throw new \RuntimeException('Insecure path ' . $nodeId);
+            throw new \RuntimeException('Insecure path '.$nodeId);
         }
 
         $ids = [];
         $links = [];
 
         /**
-         * @var Backend $backendAdapter
-         * @var Image $imageAdapter
-         * @var System $systemAdapter
+         * @var Backend
+         * @var Image       $imageAdapter
+         * @var System      $systemAdapter
          * @var BackendUser $user
          */
         $backendAdapter = $this->framework->getAdapter(Backend::class);
@@ -664,11 +663,9 @@ class DataContainerListener
 
                 // No link for the active node
                 if ((int) $node['id'] === (int) $nodeId) {
-                    $links[] = $this->onLabelCallback($node, '', null, '', true) . ' ' . $node['name'];
-                }
-                else
-                {
-                    $links[] = $this->onLabelCallback($node, '', null, '', true) . ' <a href="' . $backendAdapter->addToUrl('nn='.$node['id']) . '" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">' . $node['name'] . '</a>';
+                    $links[] = $this->onLabelCallback($node, '', null, '', true).' '.$node['name'];
+                } else {
+                    $links[] = $this->onLabelCallback($node, '', null, '', true).' <a href="'.$backendAdapter->addToUrl('nn='.$node['id']).'" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$node['name'].'</a>';
                 }
 
                 // Do not show the mounted nodes
@@ -677,28 +674,28 @@ class DataContainerListener
                 }
 
                 $id = $node['pid'];
-            } while ($id > 0 && $node['type'] !== 'root');
+            } while ($id > 0 && 'root' !== $node['type']);
         }
 
         // Check whether the node is mounted
         if (!$user->hasAccess($ids, 'nodeMounts')) {
             $session->set(self::BREADCRUMB_SESSION_KEY, 0);
-            throw new AccessDeniedException('Node ID ' . $nodeId . ' is not mounted.');
+            throw new AccessDeniedException('Node ID '.$nodeId.' is not mounted.');
         }
 
         // Limit tree
         $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = [$nodeId];
 
         // Add root link
-        $links[] = $imageAdapter->getHtml($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['icon']) . ' <a href="' . $backendAdapter->addToUrl('nn=0') . '" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">' . $GLOBALS['TL_LANG']['MSC']['filterAll'] . '</a>';
+        $links[] = $imageAdapter->getHtml($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['icon']).' <a href="'.$backendAdapter->addToUrl('nn=0').'" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">'.$GLOBALS['TL_LANG']['MSC']['filterAll'].'</a>';
         $links = array_reverse($links);
 
         // Insert breadcrumb menu
         $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['breadcrumb'] .= '
 
-<nav aria-label="' . $GLOBALS['TL_LANG']['MSC']['breadcrumbMenu'] . '">
+<nav aria-label="'.$GLOBALS['TL_LANG']['MSC']['breadcrumbMenu'].'">
   <ul id="tl_breadcrumb">
-    <li>' . implode(' › </li><li>', $links) . '</li>
+    <li>'.implode(' › </li><li>', $links).'</li>
   </ul>
 </nav>';
     }

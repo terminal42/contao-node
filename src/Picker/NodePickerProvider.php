@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Node Bundle for Contao Open Source CMS.
+ *
+ * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @author     terminal42 <https://terminal42.ch>
+ * @license    MIT
+ */
+
 namespace Terminal42\NodeBundle\Picker;
 
 use Contao\CoreBundle\Picker\AbstractPickerProvider;

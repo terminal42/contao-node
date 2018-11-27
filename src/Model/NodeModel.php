@@ -29,7 +29,7 @@ class NodeModel extends Model
     protected static $strTable = 'tl_node';
 
     /**
-     * Get the content elements
+     * Get the content elements.
      *
      * @return Model\Collection|null
      */

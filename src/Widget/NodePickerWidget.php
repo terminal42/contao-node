@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * Node Bundle for Contao Open Source CMS.
+ *
+ * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @author     terminal42 <https://terminal42.ch>
+ * @license    MIT
+ */
+
 namespace Terminal42\NodeBundle\Widget;
 
 use Contao\Database;
@@ -48,7 +56,7 @@ class NodePickerWidget extends Widget
 
         $return = '<input type="hidden" name="'.$this->strName.'" id="ctrl_'.$this->strId.'" value="'.implode(',', array_keys($values)).'">
   <input type="hidden" name="'.$this->strOrderName.'" id="ctrl_'.$this->strOrderId.'" value="'.implode(',', array_keys($values)).'">
-  <div class="selector_container">'.((count($values) > 1) ? '
+  <div class="selector_container">'.((\count($values) > 1) ? '
     <p class="sort_hint">'.$GLOBALS['TL_LANG']['MSC']['dragItemsHint'].'</p>' : '').'
     <ul id="sort_'.$this->strId.'" class="'.($this->sorting ? 'sortable' : '').'">';
 
@@ -65,7 +73,7 @@ class NodePickerWidget extends Widget
         } else {
             $extras = ['fieldType' => $this->fieldType];
 
-            if (is_array($this->rootNodes)) {
+            if (\is_array($this->rootNodes)) {
                 $extras['rootNodes'] = array_values($this->rootNodes);
             }
 
@@ -135,7 +143,7 @@ class NodePickerWidget extends Widget
      */
     protected function checkValue($input)
     {
-        if ('' === $input || !is_array($this->rootNodes)) {
+        if ('' === $input || !\is_array($this->rootNodes)) {
             return;
         }
 
@@ -145,7 +153,7 @@ class NodePickerWidget extends Widget
             $ids = array_map('intval', array_filter(explode(',', $input)));
         }
 
-        if (count(array_diff($ids, array_merge($this->rootNodes, Database::getInstance()->getChildRecords($this->rootNodes, 'tl_node')))) > 0) {
+        if (\count(array_diff($ids, array_merge($this->rootNodes, Database::getInstance()->getChildRecords($this->rootNodes, 'tl_node')))) > 0) {
             $this->addError($GLOBALS['TL_LANG']['ERR']['invalidPages']);
         }
     }
