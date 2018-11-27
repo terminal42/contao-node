@@ -23,4 +23,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['nodes'] = [
     'inputType' => 'nodePicker',
     'eval' => ['mandatory' => true, 'multiple' => true, 'fieldType' => 'checkbox', 'tl_class' => 'clr'],
     'sql' => ['type' => 'blob', 'notnull' => false],
+    'save_callback' => [
+        ['terminal42_node.listener.content', 'onNodesSaveCallback'],
+    ],
 ];

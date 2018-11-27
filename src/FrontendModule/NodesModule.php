@@ -35,7 +35,6 @@ class NodesModule extends Module
      */
     public function generate()
     {
-
         if (count($ids = StringUtil::deserialize($this->objModel->nodes, true)) === 0) {
             return '';
         }

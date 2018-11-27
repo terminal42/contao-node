@@ -39,6 +39,17 @@ class NodesContentElement extends ContentElement
             return '';
         }
 
+        $ids = array_map('intval', $ids);
+
+        // Check for potential circular reference
+        if ($this->objModel->ptable === 'tl_node' && in_array((int) $this->objModel->pid, $ids, true)) {
+            if (TL_MODE === 'BE') {
+                return sprintf('<strong class="tl_red">%s</strong>', $GLOBALS['TL_LANG']['ERR']['circularReference']);
+            }
+
+            return '';
+        }
+
         $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
 
         if (count($this->nodes) === 0) {

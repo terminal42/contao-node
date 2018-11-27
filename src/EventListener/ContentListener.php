@@ -3,6 +3,9 @@
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Exception\AccessDeniedException;
+use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
+use Contao\DataContainer;
+use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Terminal42\NodeBundle\Model\NodeModel;
 use Terminal42\NodeBundle\PermissionChecker;
@@ -15,6 +18,11 @@ class ContentListener
     private $db;
 
     /**
+     * @var ContaoFrameworkInterface
+     */
+    private $framework;
+
+    /**
      * @var PermissionChecker
      */
     private $permissionChecker;
@@ -23,10 +31,16 @@ class ContentListener
      * ContentListener constructor.
      *
      * @param Connection $db
+     * @param ContaoFrameworkInterface $framework
      * @param PermissionChecker $permissionChecker
      */
-    public function __construct(Connection $db, PermissionChecker $permissionChecker) {
+    public function __construct(
+        Connection $db,
+        ContaoFrameworkInterface $framework,
+        PermissionChecker $permissionChecker
+    ) {
         $this->db = $db;
+        $this->framework = $framework;
         $this->permissionChecker = $permissionChecker;
     }
 
@@ -43,6 +57,36 @@ class ContentListener
         }
 
         $this->checkPermissions();
+    }
+
+    /**
+     * On nodes fields save callback.
+     *
+     * @param string        $value
+     * @param DataContainer $dc
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function onNodesSaveCallback(string $value, DataContainer $dc): string
+    {
+        // Check for potential circular reference
+        if ($dc->activeRecord->ptable === 'tl_node') {
+            /** @var StringUtil $stringUtilAdapter */
+            $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
+
+            $ids = (array) $stringUtilAdapter->deserialize($value, true);
+            $ids = array_map('intval', $ids);
+
+            if (in_array((int) $dc->activeRecord->pid, $ids, true)) {
+                throw new \InvalidArgumentException($GLOBALS['TL_LANG']['ERR']['circularReference']);
+            }
+
+            $value = serialize($ids);
+        }
+
+        return $value;
     }
 
     /**
