@@ -49,21 +49,6 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function getUrl(PickerConfig $config)
-    {
-        // Set the news categories root in session for further reference in onload_callback (see #137)
-        if (\is_array($rootNodes = $config->getExtra('rootNodes'))) {
-            $_SESSION['NEWS_CATEGORIES_ROOT'] = $rootNodes;
-        } else {
-            unset($_SESSION['NEWS_CATEGORIES_ROOT']);
-        }
-
-        return parent::getUrl($config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function convertDcaValue(PickerConfig $config, $value)
     {
         return (int) $value;

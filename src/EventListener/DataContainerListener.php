@@ -568,7 +568,7 @@ class DataContainerListener
                         }
 
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                            throw new AccessDeniedException(\sprintf('Not enough permissions to %s news category ID %s.', $action, $nodeId));
+                            throw new AccessDeniedException(\sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
                         }
                         break;
                     case 'editAll':
