@@ -63,10 +63,10 @@ class DataContainerListener
     /**
      * DataContainerListener constructor.
      *
-     * @param Connection               $db
-     * @param LoggerInterface          $logger
-     * @param PermissionChecker        $permissionChecker
-     * @param SessionInterface         $session
+     * @param Connection        $db
+     * @param LoggerInterface   $logger
+     * @param PermissionChecker $permissionChecker
+     * @param SessionInterface  $session
      */
     public function __construct(
         Connection $db,
