@@ -141,7 +141,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 \Terminal42\NodeBundle\Model\NodeModel::TYPE_FOLDER,
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_node']['typeRef'],
-            'eval' => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'eval' => ['tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 7, 'default' => ''],
         ],
         'languages' => [
