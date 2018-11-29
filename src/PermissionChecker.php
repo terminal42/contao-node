@@ -11,7 +11,6 @@
 namespace Terminal42\NodeBundle;
 
 use Contao\BackendUser;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\Database;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
@@ -31,11 +30,6 @@ class PermissionChecker
     private $db;
 
     /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-
-    /**
      * @var TokenStorageInterface
      */
     private $tokenStorage;
@@ -48,17 +42,12 @@ class PermissionChecker
     /**
      * PermissionChecker constructor.
      *
-     * @param Connection               $db
-     * @param ContaoFrameworkInterface $framework
-     * @param TokenStorageInterface    $tokenStorage
+     * @param Connection            $db
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(
-        Connection $db,
-        ContaoFrameworkInterface $framework,
-        TokenStorageInterface $tokenStorage
-    ) {
+    public function __construct(Connection $db, TokenStorageInterface $tokenStorage)
+    {
         $this->db = $db;
-        $this->framework = $framework;
         $this->tokenStorage = $tokenStorage;
     }
 
@@ -127,10 +116,7 @@ class PermissionChecker
             return true;
         }
 
-        /** @var Database $db */
-        $db = $this->framework->createInstance(Database::class);
-
-        $ids = $db->getChildRecords($roots, 'tl_node', false, $roots);
+        $ids = Database::getInstance()->getChildRecords($roots, 'tl_node', false, $roots);
         $ids = \array_map('intval', $ids);
 
         return \in_array($nodeId, $ids, true);
@@ -149,18 +135,15 @@ class PermissionChecker
 
         $user = $this->getUser();
 
-        /** @var StringUtil $stringUtil */
-        $stringUtil = $this->framework->getAdapter(StringUtil::class);
-
         // Add the permissions on group level
         if ('custom' !== $user->inherit) {
             $groups = $this->db->fetchAll('SELECT id, nodeMounts, nodePermissions FROM tl_user_group WHERE id IN('.\implode(',', \array_map('intval', $user->groups)).')');
 
             foreach ($groups as $group) {
-                $permissions = $stringUtil->deserialize($group['nodePermissions'], true);
+                $permissions = StringUtil::deserialize($group['nodePermissions'], true);
 
                 if (\in_array(self::PERMISSION_CREATE, $permissions, true)) {
-                    $nodeIds = (array) $stringUtil->deserialize($group['nodeMounts'], true);
+                    $nodeIds = (array) StringUtil::deserialize($group['nodeMounts'], true);
                     $nodeIds[] = $nodeId;
 
                     $this->db->update('tl_user_group', ['nodeMounts' => \serialize($nodeIds)], ['id' => $group['id']]);
@@ -171,10 +154,10 @@ class PermissionChecker
         // Add the permissions on user level
         if ('group' !== $user->inherit) {
             $userData = $this->db->fetchAssoc('SELECT nodePermissions, nodeMounts FROM tl_user WHERE id=?', [$user->id]);
-            $permissions = $stringUtil->deserialize($userData['nodePermissions'], true);
+            $permissions = StringUtil::deserialize($userData['nodePermissions'], true);
 
             if (\in_array(self::PERMISSION_CREATE, $permissions, true)) {
-                $nodeIds = (array) $stringUtil->deserialize($userData['nodeMounts'], true);
+                $nodeIds = (array) StringUtil::deserialize($userData['nodeMounts'], true);
                 $nodeIds[] = $nodeId;
 
                 $this->db->update('tl_user', ['nodeMounts' => \serialize($nodeIds)], ['id' => $user->id]);

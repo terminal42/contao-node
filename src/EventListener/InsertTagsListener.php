@@ -12,17 +12,11 @@ declare(strict_types=1);
 
 namespace Terminal42\NodeBundle\EventListener;
 
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\StringUtil;
 use Terminal42\NodeBundle\NodeManager;
 
 class InsertTagsListener
 {
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-
     /**
      * @var NodeManager
      */
@@ -31,12 +25,10 @@ class InsertTagsListener
     /**
      * InsertTagsListener constructor.
      *
-     * @param ContaoFrameworkInterface $framework
-     * @param NodeManager              $manager
+     * @param NodeManager $manager
      */
-    public function __construct(ContaoFrameworkInterface $framework, NodeManager $manager)
+    public function __construct(NodeManager $manager)
     {
-        $this->framework = $framework;
         $this->manager = $manager;
     }
 
@@ -67,10 +59,7 @@ class InsertTagsListener
      */
     private function generateNodes(string $ids): string
     {
-        /** @var StringUtil $stringUtilAdapter */
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        if (0 === \count($ids = $stringUtilAdapter->trimsplit(',', $ids))) {
+        if (0 === \count($ids = StringUtil::trimsplit(',', $ids))) {
             return '';
         }
 

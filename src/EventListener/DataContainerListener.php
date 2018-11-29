@@ -17,7 +17,6 @@ use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DataContainer;
 use Contao\Environment;
@@ -47,11 +46,6 @@ class DataContainerListener
     private $db;
 
     /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -70,20 +64,17 @@ class DataContainerListener
      * DataContainerListener constructor.
      *
      * @param Connection               $db
-     * @param ContaoFrameworkInterface $framework
      * @param LoggerInterface          $logger
      * @param PermissionChecker        $permissionChecker
      * @param SessionInterface         $session
      */
     public function __construct(
         Connection $db,
-        ContaoFrameworkInterface $framework,
         LoggerInterface $logger,
         PermissionChecker $permissionChecker,
         SessionInterface $session
     ) {
         $this->db = $db;
-        $this->framework = $framework;
         $this->logger = $logger;
         $this->permissionChecker = $permissionChecker;
         $this->session = $session;
@@ -114,15 +105,6 @@ class DataContainerListener
      */
     public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, $clipboard = null): string
     {
-        /**
-         * @var Backend
-         * @var Image   $imageAdapter
-         * @var System  $systemAdapter
-         */
-        $backendAdapter = $this->framework->getAdapter(Backend::class);
-        $imageAdapter = $this->framework->getAdapter(Image::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
         $disablePA = false;
         $disablePI = false;
 
@@ -145,14 +127,14 @@ class DataContainerListener
         $return = '';
 
         // Return the buttons
-        $imagePasteAfter = $imageAdapter->getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
-        $imagePasteInto = $imageAdapter->getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
+        $imagePasteAfter = Image::getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
+        $imagePasteInto = Image::getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? $imageAdapter->getHtml('pasteafter_.svg').' ' : '<a href="'.$backendAdapter->addToUrl('act='.$clipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.$stringUtilAdapter->specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
+            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return.($disablePI ? $imageAdapter->getHtml('pasteinto_.svg').' ' : '<a href="'.$backendAdapter->addToUrl('act='.$clipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.$stringUtilAdapter->specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
+        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
     /**
@@ -283,37 +265,26 @@ class DataContainerListener
      */
     public function onLabelCallback(array $row, string $label, DataContainer $dc = null, string $imageAttribute = '', bool $returnImage = false): string
     {
-        /**
-         * @var Backend
-         * @var Image      $imageAdapter
-         * @var StringUtil $stringUtilAdapter
-         * @var System     $systemAdapter
-         */
-        $backendAdapter = $this->framework->getAdapter(Backend::class);
-        $imageAdapter = $this->framework->getAdapter(Image::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $systemAdapter = $this->framework->getAdapter(System::class);
-
         $image = (NodeModel::TYPE_CONTENT === $row['type']) ? 'articles.svg' : 'folderC.svg';
 
         // Return the image only
         if ($returnImage) {
-            return $imageAdapter->getHtml($image, '', $imageAttribute);
+            return Image::getHtml($image, '', $imageAttribute);
         }
 
         $languages = [];
-        $allLanguages = $systemAdapter->getLanguages();
+        $allLanguages = System::getLanguages();
 
         // Generate the languages
-        foreach ($stringUtilAdapter->trimsplit(',', $row['languages']) as $language) {
+        foreach (StringUtil::trimsplit(',', $row['languages']) as $language) {
             $languages[] = $allLanguages[$language];
         }
 
         return sprintf(
             '%s <a href="%s" title="%s">%s</a>%s',
-            $imageAdapter->getHtml($image, '', $imageAttribute),
-            $backendAdapter->addToUrl('nn='.$row['id']),
-            $stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
+            Image::getHtml($image, '', $imageAttribute),
+            Backend::addToUrl('nn='.$row['id']),
+            StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
             (\count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : ''
         );
@@ -328,10 +299,7 @@ class DataContainerListener
      */
     public function onLanguagesOptionsCallback(): array
     {
-        /** @var System $system */
-        $system = $this->framework->getAdapter(System::class);
-
-        return $system->getLanguages();
+        return System::getLanguages();
     }
 
     /**
@@ -362,21 +330,11 @@ class DataContainerListener
      */
     private function generateButton(array $row, string $href, string $label, string $title, string $icon, string $attributes, bool $active): string
     {
-        /** @var Image $imageAdapter */
-        $imageAdapter = $this->framework->getAdapter(Image::class);
-
         if (!$active) {
-            return $imageAdapter->getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
+            return Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $icon)).' ';
         }
 
-        /**
-         * @var Backend
-         * @var StringUtil $stringUtilAdapter
-         */
-        $backendAdapter = $this->framework->getAdapter(Backend::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-        return '<a href="'.$backendAdapter->addToUrl($href.'&amp;id='.$row['id']).'" title="'.$stringUtilAdapter->specialchars($title).'"'.$attributes.'>'.$imageAdapter->getHtml($icon, $label).'</a> ';
+        return '<a href="'.Backend::addToUrl($href.'&amp;id='.$row['id']).'" title="'.StringUtil::specialchars($title).'"'.$attributes.'>'.Image::getHtml($icon, $label).'</a> ';
     }
 
     /**
@@ -386,14 +344,11 @@ class DataContainerListener
      */
     private function reloadNodePickerWidget(DataContainer $dc): void
     {
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-
-        $id = $inputAdapter->get('id');
-        $field = $dc->inputName = $inputAdapter->post('name');
+        $id = Input::get('id');
+        $field = $dc->inputName = Input::post('name');
 
         // Handle the keys in "edit multiple" mode
-        if ('editAll' === $inputAdapter->get('act')) {
+        if ('editAll' === Input::get('act')) {
             $id = \preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
             $field = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
         }
@@ -415,7 +370,7 @@ class DataContainerListener
         $value = null;
 
         // Load the value
-        if ('overrideAll' !== $inputAdapter->get('act') && $id > 0 && $this->db->getSchemaManager()->tablesExist([$dc->table])) {
+        if ('overrideAll' !== Input::get('act') && $id > 0 && $this->db->getSchemaManager()->tablesExist([$dc->table])) {
             $row = $this->db->fetchAssoc("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
             // The record does not exist
@@ -435,12 +390,9 @@ class DataContainerListener
 
         // Call the load_callback
         if (\is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'])) {
-            /** @var System $systemAdapter */
-            $systemAdapter = $this->framework->getAdapter(System::class);
-
             foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] as $callback) {
                 if (\is_array($callback)) {
-                    $value = $systemAdapter->importStatic($callback[0])->{$callback[1]}($value, $dc);
+                    $value = System::importStatic($callback[0])->{$callback[1]}($value, $dc);
                 } elseif (\is_callable($callback)) {
                     $value = $callback($value, $dc);
                 }
@@ -448,13 +400,11 @@ class DataContainerListener
         }
 
         // Set the new value
-        $value = $inputAdapter->post('value', true);
+        $value = Input::post('value', true);
 
         // Convert the selected values
         if ($value) {
-            /** @var StringUtil $stringUtilAdapter */
-            $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-            $value = $stringUtilAdapter->trimsplit("\t", $value);
+            $value = StringUtil::trimsplit("\t", $value);
             $value = \serialize($value);
         }
 
@@ -496,9 +446,6 @@ class DataContainerListener
             return;
         }
 
-        /** @var Input $inputAdapter */
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-
         // Close the table if user is not allowed to create new records
         if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE)) {
             $GLOBALS['TL_DCA'][$dc->table]['config']['closed'] = true;
@@ -521,7 +468,7 @@ class DataContainerListener
         if (\is_array($session['CURRENT']['IDS'])) {
             $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
                 $session['CURRENT']['IDS'],
-                ('deleteAll' === $inputAdapter->get('act')) ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
+                ('deleteAll' === Input::get('act')) ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
             );
 
             $this->session->replace($session);
@@ -541,10 +488,10 @@ class DataContainerListener
             }
 
             // Check current action
-            if (($action = $inputAdapter->get('act')) && 'paste' !== $action) {
+            if (($action = Input::get('act')) && 'paste' !== $action) {
                 switch ($action) {
                     case 'edit':
-                        $nodeId = (int) $inputAdapter->get('id');
+                        $nodeId = (int) Input::get('id');
 
                         // Dynamically add the record to the user profile
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
@@ -564,7 +511,7 @@ class DataContainerListener
                     case 'delete':
                     case 'show':
                         if (!isset($nodeId)) {
-                            $nodeId = (int) $inputAdapter->get('id');
+                            $nodeId = (int) Input::get('id');
                         }
 
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
@@ -593,29 +540,18 @@ class DataContainerListener
      */
     private function addBreadcrumb(DataContainer $dc): void
     {
-        /**
-         * @var Controller
-         * @var Environment $environmentAdapter
-         * @var Input       $inputAdapter
-         * @var Validator   $validatorAdapter
-         */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-        $environmentAdapter = $this->framework->getAdapter(Environment::class);
-        $inputAdapter = $this->framework->getAdapter(Input::class);
-        $validatorAdapter = $this->framework->getAdapter(Validator::class);
-
         /** @var AttributeBagInterface $session */
         $session = $this->session->getBag('contao_backend');
 
         // Set a new node
         if (isset($_GET['nn'])) {
             // Check the path
-            if ($validatorAdapter->isInsecurePath($inputAdapter->get('nn', true))) {
-                throw new \RuntimeException('Insecure path '.$inputAdapter->get('nn', true));
+            if (Validator::isInsecurePath(Input::get('nn', true))) {
+                throw new \RuntimeException('Insecure path '.Input::get('nn', true));
             }
 
-            $session->set(self::BREADCRUMB_SESSION_KEY, $inputAdapter->get('nn', true));
-            $controllerAdapter->redirect(preg_replace('/&nn=[^&]*/', '', $environmentAdapter->get('request')));
+            $session->set(self::BREADCRUMB_SESSION_KEY, Input::get('nn', true));
+            Controller::redirect(preg_replace('/&nn=[^&]*/', '', Environment::get('request')));
         }
 
         if (($nodeId = $session->get(self::BREADCRUMB_SESSION_KEY)) < 1) {
@@ -623,23 +559,13 @@ class DataContainerListener
         }
 
         // Check the path
-        if ($validatorAdapter->isInsecurePath($nodeId)) {
+        if (Validator::isInsecurePath($nodeId)) {
             throw new \RuntimeException('Insecure path '.$nodeId);
         }
 
         $ids = [];
         $links = [];
-
-        /**
-         * @var Backend
-         * @var Image       $imageAdapter
-         * @var System      $systemAdapter
-         * @var BackendUser $user
-         */
-        $backendAdapter = $this->framework->getAdapter(Backend::class);
-        $imageAdapter = $this->framework->getAdapter(Image::class);
-        $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-        $user = $this->framework->createInstance(BackendUser::class);
+        $user = BackendUser::getInstance();
 
         // Generate breadcrumb trail
         if ($nodeId) {
@@ -665,7 +591,7 @@ class DataContainerListener
                 if ((int) $node['id'] === (int) $nodeId) {
                     $links[] = $this->onLabelCallback($node, '', null, '', true).' '.$node['name'];
                 } else {
-                    $links[] = $this->onLabelCallback($node, '', null, '', true).' <a href="'.$backendAdapter->addToUrl('nn='.$node['id']).'" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$node['name'].'</a>';
+                    $links[] = $this->onLabelCallback($node, '', null, '', true).' <a href="'.Backend::addToUrl('nn='.$node['id']).'" title="'.StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']).'">'.$node['name'].'</a>';
                 }
 
                 // Do not show the mounted nodes
@@ -687,7 +613,7 @@ class DataContainerListener
         $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = [$nodeId];
 
         // Add root link
-        $links[] = $imageAdapter->getHtml($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['icon']).' <a href="'.$backendAdapter->addToUrl('nn=0').'" title="'.$stringUtilAdapter->specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">'.$GLOBALS['TL_LANG']['MSC']['filterAll'].'</a>';
+        $links[] = Image::getHtml($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['icon']).' <a href="'.Backend::addToUrl('nn=0').'" title="'.StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">'.$GLOBALS['TL_LANG']['MSC']['filterAll'].'</a>';
         $links = array_reverse($links);
 
         // Insert breadcrumb menu

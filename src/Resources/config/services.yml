@@ -2,15 +2,12 @@ services:
     terminal42_node.manager:
         class: Terminal42\NodeBundle\NodeManager
         public: true
-        arguments:
-            - "@contao.framework"
 
     terminal42_node.listener.content:
         class: Terminal42\NodeBundle\EventListener\ContentListener
         public: true
         arguments:
             - "@database_connection"
-            - "@contao.framework"
             - "@terminal42_node.permission_checker"
 
     terminal42_node.listener.data_container:
@@ -18,7 +15,6 @@ services:
         public: true
         arguments:
             - "@database_connection"
-            - "@contao.framework"
             - "@monolog.logger.contao"
             - "@terminal42_node.permission_checker"
             - "@session"
@@ -27,7 +23,6 @@ services:
         class: Terminal42\NodeBundle\EventListener\InsertTagsListener
         public: true
         arguments:
-            - "@contao.framework"
             - "@terminal42_node.manager"
 
     terminal42_node.permission_checker:
@@ -35,7 +30,6 @@ services:
         public: false
         arguments:
             - "@database_connection"
-            - "@contao.framework"
             - "@security.token_storage"
 
     terminal42_node.picker:

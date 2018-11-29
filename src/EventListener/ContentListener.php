@@ -11,7 +11,6 @@
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Exception\AccessDeniedException;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Contao\DataContainer;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
@@ -26,11 +25,6 @@ class ContentListener
     private $db;
 
     /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-
-    /**
      * @var PermissionChecker
      */
     private $permissionChecker;
@@ -38,17 +32,12 @@ class ContentListener
     /**
      * ContentListener constructor.
      *
-     * @param Connection               $db
-     * @param ContaoFrameworkInterface $framework
-     * @param PermissionChecker        $permissionChecker
+     * @param Connection        $db
+     * @param PermissionChecker $permissionChecker
      */
-    public function __construct(
-        Connection $db,
-        ContaoFrameworkInterface $framework,
-        PermissionChecker $permissionChecker
-    ) {
+    public function __construct(Connection $db, PermissionChecker $permissionChecker)
+    {
         $this->db = $db;
-        $this->framework = $framework;
         $this->permissionChecker = $permissionChecker;
     }
 
@@ -81,10 +70,7 @@ class ContentListener
     {
         // Check for potential circular reference
         if ('tl_node' === $dc->activeRecord->ptable) {
-            /** @var StringUtil $stringUtilAdapter */
-            $stringUtilAdapter = $this->framework->getAdapter(StringUtil::class);
-
-            $ids = (array) $stringUtilAdapter->deserialize($value, true);
+            $ids = (array) StringUtil::deserialize($value, true);
             $ids = array_map('intval', $ids);
 
             if (\in_array((int) $dc->activeRecord->pid, $ids, true)) {

@@ -12,27 +12,10 @@ namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
 use Contao\Controller;
-use Contao\CoreBundle\Framework\Adapter;
-use Contao\CoreBundle\Framework\ContaoFrameworkInterface;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodeManager
 {
-    /**
-     * @var ContaoFrameworkInterface
-     */
-    private $framework;
-
-    /**
-     * NodeManager constructor.
-     *
-     * @param ContaoFrameworkInterface $framework
-     */
-    public function __construct(ContaoFrameworkInterface $framework)
-    {
-        $this->framework = $framework;
-    }
-
     /**
      * Generate single node.
      *
@@ -46,17 +29,11 @@ class NodeManager
             return null;
         }
 
-        /** @var NodeModel $nodeModelAdapter */
-        $nodeModelAdapter = $this->framework->getAdapter(NodeModel::class);
-
-        if (null === ($nodeModel = $nodeModelAdapter->findOneBy(['id=?', 'type=?'], [$id, NodeModel::TYPE_CONTENT]))) {
+        if (null === ($nodeModel = NodeModel::findOneBy(['id=?', 'type=?'], [$id, NodeModel::TYPE_CONTENT]))) {
             return null;
         }
 
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
-        return $this->generateBuffer($nodeModel, $controllerAdapter);
+        return $this->generateBuffer($nodeModel);
     }
 
     /**
@@ -74,10 +51,7 @@ class NodeManager
             return [];
         }
 
-        /** @var NodeModel $nodeModelAdapter */
-        $nodeModelAdapter = $this->framework->getAdapter(NodeModel::class);
-
-        $nodeModels = $nodeModelAdapter->findBy(
+        $nodeModels = NodeModel::findBy(
             ['id IN ('.implode(',', $ids).')', 'type=?'],
             [NodeModel::TYPE_CONTENT, implode(',', $ids)],
             ['order' => 'FIND_IN_SET(`id`, ?)']
@@ -89,12 +63,9 @@ class NodeManager
 
         $nodes = [];
 
-        /** @var Controller $controllerAdapter */
-        $controllerAdapter = $this->framework->getAdapter(Controller::class);
-
         /** @var NodeModel $nodeModel */
         foreach ($nodeModels as $nodeModel) {
-            $nodes[$nodeModel->id] = $this->generateBuffer($nodeModel, $controllerAdapter);
+            $nodes[$nodeModel->id] = $this->generateBuffer($nodeModel);
         }
 
         return array_filter($nodes);
@@ -103,19 +74,18 @@ class NodeManager
     /**
      * Generate the node buffer (content elements).
      *
-     * @param NodeModel          $nodeModel
-     * @param Controller|Adapter $controllerAdapter
+     * @param NodeModel $nodeModel
      *
      * @return string
      */
-    private function generateBuffer(NodeModel $nodeModel, $controllerAdapter): string
+    private function generateBuffer(NodeModel $nodeModel): string
     {
         $buffer = '';
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
             foreach ($elements as $element) {
-                $buffer .= $controllerAdapter->getContentElement($element);
+                $buffer .= Controller::getContentElement($element);
             }
         }
 
