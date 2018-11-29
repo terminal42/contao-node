@@ -68,16 +68,22 @@ class ContentListener
      */
     public function onNodesSaveCallback(string $value, DataContainer $dc): string
     {
-        // Check for potential circular reference
-        if ('tl_node' === $dc->activeRecord->ptable) {
-            $ids = (array) StringUtil::deserialize($value, true);
-            $ids = array_map('intval', $ids);
+        $ids = (array) StringUtil::deserialize($value, true);
 
-            if (\in_array((int) $dc->activeRecord->pid, $ids, true)) {
-                throw new \InvalidArgumentException($GLOBALS['TL_LANG']['ERR']['circularReference']);
+        if (count($ids) > 0) {
+            $folders = $this->db->fetchAll('SELECT name FROM tl_node WHERE id IN (' . implode(', ', $ids) . ') AND type=?', [NodeModel::TYPE_FOLDER]);
+
+            // Do not allow folder nodes
+            if (count($folders) > 0) {
+                throw new \InvalidArgumentException(sprintf($GLOBALS['TL_LANG']['ERR']['invalidNodes'], implode(', ', array_column($folders, 'name'))));
             }
 
-            $value = serialize($ids);
+            $ids = array_map('intval', $ids);
+
+            // Check for potential circular reference
+            if ('tl_node' === $dc->activeRecord->ptable && \in_array((int) $dc->activeRecord->pid, $ids, true)) {
+                throw new \InvalidArgumentException($GLOBALS['TL_LANG']['ERR']['circularReference']);
+            }
         }
 
         return $value;
