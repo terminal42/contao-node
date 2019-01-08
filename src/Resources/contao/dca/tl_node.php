@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
 
     // Palettes
     'palettes' => [
-        'default' => '{name_legend},name,type;{filter_legend},languages',
+        'default' => '{name_legend},name,type;{filter_legend},languages,tags',
     ],
 
     // Fields
@@ -152,6 +152,13 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'options_callback' => ['terminal42_node.listener.data_container', 'onLanguagesOptionsCallback'],
             'eval' => ['multiple' => true, 'chosen' => true, 'csv' => ',', 'tl_class' => 'clr'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+        ],
+        'tags' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['tags'],
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'cfgTags',
+            'eval' => ['tagsManager' => 'terminal42_node', 'tl_class' => 'clr'],
         ],
     ],
 ];

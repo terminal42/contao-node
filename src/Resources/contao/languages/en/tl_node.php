@@ -11,9 +11,9 @@
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Name', 'Please enter the internal node name.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Type', 'Here you can choose the node type.'];
 $GLOBALS['TL_LANG']['tl_node']['languages'] = ['Languages', 'Here you can choose the node languages that will be used for filtering in the backend.'];
+$GLOBALS['TL_LANG']['tl_node']['tags'] = ['Tags', 'Here you can enter the tags that will be used for filtering in the backend.'];
 $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Parent node'];
 $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
-// @todo – tags
 
 /*
  * Legends

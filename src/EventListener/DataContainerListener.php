@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Terminal42\NodeBundle\EventListener;
 
+use Codefog\TagsBundle\Manager\ManagerInterface;
+use Codefog\TagsBundle\Tag;
 use Contao\Backend;
 use Contao\BackendUser;
 use Contao\Controller;
@@ -26,6 +28,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
+use Haste\Model\Model;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,23 +64,31 @@ class DataContainerListener
     private $session;
 
     /**
+     * @var ManagerInterface
+     */
+    private $tagsManager;
+
+    /**
      * DataContainerListener constructor.
      *
      * @param Connection        $db
      * @param LoggerInterface   $logger
      * @param PermissionChecker $permissionChecker
      * @param SessionInterface  $session
+     * @param ManagerInterface  $tagsManager
      */
     public function __construct(
         Connection $db,
         LoggerInterface $logger,
         PermissionChecker $permissionChecker,
-        SessionInterface $session
+        SessionInterface $session,
+        ManagerInterface $tagsManager
     ) {
         $this->db = $db;
         $this->logger = $logger;
         $this->permissionChecker = $permissionChecker;
         $this->session = $session;
+        $this->tagsManager = $tagsManager;
     }
 
     /**
@@ -280,13 +291,25 @@ class DataContainerListener
             $languages[] = $allLanguages[$language];
         }
 
+        $tags = [];
+        $tagIds = Model::getRelatedValues($dc->table, 'tags', $row['id']);
+
+        // Generate the tags
+        if (count($tagIds) > 0) {
+            /** @var Tag $tag */
+            foreach ($this->tagsManager->findMultiple(['values' => $tagIds]) as $tag) {
+                $tags[] = $tag->getName();
+            }
+        }
+
         return sprintf(
-            '%s <a href="%s" title="%s">%s</a>%s',
+            '%s <a href="%s" title="%s">%s</a>%s%s',
             Image::getHtml($image, '', $imageAttribute),
             Backend::addToUrl('nn='.$row['id']),
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            (\count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : ''
+            (\count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
+            (\count($tags) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : ''
         );
     }
 
