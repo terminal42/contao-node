@@ -292,7 +292,7 @@ class DataContainerListener
         }
 
         $tags = [];
-        $tagIds = Model::getRelatedValues($dc->table, 'tags', $row['id']);
+        $tagIds = Model::getRelatedValues('tl_node', 'tags', $row['id']);
 
         // Generate the tags
         if (count($tagIds) > 0) {
