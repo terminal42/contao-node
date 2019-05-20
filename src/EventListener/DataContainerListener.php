@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * Node Bundle for Contao Open Source CMS.
  *
- * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
  * @author     terminal42 <https://terminal42.ch>
  * @license    MIT
  */
@@ -120,7 +120,7 @@ class DataContainerListener
         $disablePI = false;
 
         // Disable all buttons if there is a circular reference
-        if (false !== $clipboard && (('cut' === $clipboard['mode'] && ($cr || (int) $clipboard['id'] === (int) $row['id'])) || ('cutAll' === $clipboard['mode'] && ($cr || \in_array((int) $row['id'], \array_map('intval', $clipboard['id']), true))))) {
+        if (false !== $clipboard && (('cut' === $clipboard['mode'] && ($cr || (int) $clipboard['id'] === (int) $row['id'])) || ('cutAll' === $clipboard['mode'] && ($cr || \in_array((int) $row['id'], array_map('intval', $clipboard['id']), true))))) {
             $disablePA = true;
             $disablePI = true;
         }
@@ -295,7 +295,7 @@ class DataContainerListener
         $tagIds = Model::getRelatedValues('tl_node', 'tags', $row['id']);
 
         // Generate the tags
-        if (count($tagIds) > 0) {
+        if (\count($tagIds) > 0) {
             /** @var Tag $tag */
             foreach ($this->tagsManager->findMultiple(['values' => $tagIds]) as $tag) {
                 $tags[] = $tag->getName();
@@ -372,8 +372,8 @@ class DataContainerListener
 
         // Handle the keys in "edit multiple" mode
         if ('editAll' === Input::get('act')) {
-            $id = \preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
-            $field = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
+            $id = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $field);
+            $field = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $field);
         }
 
         $dc->field = $field;
@@ -382,7 +382,7 @@ class DataContainerListener
         if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
             $this->logger->log(
                 LogLevel::ERROR,
-                \sprintf('Field "%s" does not exist in DCA "%s"', $field, $dc->table),
+                sprintf('Field "%s" does not exist in DCA "%s"', $field, $dc->table),
                 ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]
             );
 
@@ -400,7 +400,7 @@ class DataContainerListener
             if (!$row) {
                 $this->logger->log(
                     LogLevel::ERROR,
-                    \sprintf('A record with the ID "%s" does not exist in table "%s"', $id, $dc->table),
+                    sprintf('A record with the ID "%s" does not exist in table "%s"', $id, $dc->table),
                     ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]
                 );
 
@@ -428,7 +428,7 @@ class DataContainerListener
         // Convert the selected values
         if ($value) {
             $value = StringUtil::trimsplit("\t", $value);
-            $value = \serialize($value);
+            $value = serialize($value);
         }
 
         /** @var NodePickerWidget $strClass */
@@ -522,7 +522,7 @@ class DataContainerListener
                             $sessionBag = $this->session->getbag('contao_backend');
 
                             $newRecords = $sessionBag->get('new_records');
-                            $newRecords = \is_array($newRecords[$dc->table]) ? \array_map('intval', $newRecords[$dc->table]) : [];
+                            $newRecords = \is_array($newRecords[$dc->table]) ? array_map('intval', $newRecords[$dc->table]) : [];
 
                             if (\in_array($nodeId, $newRecords, true)) {
                                 $this->permissionChecker->addNodeToAllowedRoots($nodeId);
@@ -538,14 +538,14 @@ class DataContainerListener
                         }
 
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                            throw new AccessDeniedException(\sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
+                            throw new AccessDeniedException(sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
                         }
                         break;
                     case 'editAll':
                     case 'deleteAll':
                     case 'overrideAll':
                         if (\is_array($session['CURRENT']['IDS'])) {
-                            $session['CURRENT']['IDS'] = \array_intersect($session['CURRENT']['IDS'], $roots);
+                            $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $roots);
                             $this->session->replace($session);
                         }
                         break;

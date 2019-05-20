@@ -3,7 +3,7 @@
 /*
  * Node Bundle for Contao Open Source CMS.
  *
- * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
  * @author     terminal42 <https://terminal42.ch>
  * @license    MIT
  */
@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
     'list' => [
         'sorting' => [
             'mode' => 5,
-            'icon' => 'filemanager.svg', // @todo
+            'icon' => 'folderC.svg',
             'paste_button_callback' => ['terminal42_node.listener.data_container', 'onPasteButtonCallback'],
             'panelLayout' => 'filter;search',
         ],

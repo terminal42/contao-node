@@ -3,7 +3,7 @@
 /*
  * Node Bundle for Contao Open Source CMS.
  *
- * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
  * @author     terminal42 <https://terminal42.ch>
  * @license    MIT
  */
@@ -36,7 +36,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
         }
 
         if ($this->supportsValue($config)) {
-            $attributes['value'] = \array_map('intval', \explode(',', $config->getValue()));
+            $attributes['value'] = array_map('intval', explode(',', $config->getValue()));
         }
 
         if (\is_array($rootNodes = $config->getExtra('rootNodes'))) {
@@ -75,8 +75,8 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
      */
     public function supportsValue(PickerConfig $config)
     {
-        foreach (\explode(',', $config->getValue()) as $id) {
-            if (!\is_numeric($id)) {
+        foreach (explode(',', $config->getValue()) as $id) {
+            if (!is_numeric($id)) {
                 return false;
             }
         }

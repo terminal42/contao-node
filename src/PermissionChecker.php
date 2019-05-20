@@ -3,7 +3,7 @@
 /*
  * Node Bundle for Contao Open Source CMS.
  *
- * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
  * @author     terminal42 <https://terminal42.ch>
  * @license    MIT
  */
@@ -95,7 +95,7 @@ class PermissionChecker
             return null;
         }
 
-        return \array_map('intval', (array) $this->getUser()->nodeMounts);
+        return array_map('intval', (array) $this->getUser()->nodeMounts);
     }
 
     /**
@@ -117,7 +117,7 @@ class PermissionChecker
         }
 
         $ids = Database::getInstance()->getChildRecords($roots, 'tl_node', false, $roots);
-        $ids = \array_map('intval', $ids);
+        $ids = array_map('intval', $ids);
 
         return \in_array($nodeId, $ids, true);
     }
@@ -137,7 +137,7 @@ class PermissionChecker
 
         // Add the permissions on group level
         if ('custom' !== $user->inherit) {
-            $groups = $this->db->fetchAll('SELECT id, nodeMounts, nodePermissions FROM tl_user_group WHERE id IN('.\implode(',', \array_map('intval', $user->groups)).')');
+            $groups = $this->db->fetchAll('SELECT id, nodeMounts, nodePermissions FROM tl_user_group WHERE id IN('.implode(',', array_map('intval', $user->groups)).')');
 
             foreach ($groups as $group) {
                 $permissions = StringUtil::deserialize($group['nodePermissions'], true);
@@ -146,7 +146,7 @@ class PermissionChecker
                     $nodeIds = (array) StringUtil::deserialize($group['nodeMounts'], true);
                     $nodeIds[] = $nodeId;
 
-                    $this->db->update('tl_user_group', ['nodeMounts' => \serialize($nodeIds)], ['id' => $group['id']]);
+                    $this->db->update('tl_user_group', ['nodeMounts' => serialize($nodeIds)], ['id' => $group['id']]);
                 }
             }
         }
@@ -160,12 +160,12 @@ class PermissionChecker
                 $nodeIds = (array) StringUtil::deserialize($userData['nodeMounts'], true);
                 $nodeIds[] = $nodeId;
 
-                $this->db->update('tl_user', ['nodeMounts' => \serialize($nodeIds)], ['id' => $user->id]);
+                $this->db->update('tl_user', ['nodeMounts' => serialize($nodeIds)], ['id' => $user->id]);
             }
         }
 
         // Add the new element to the user object
-        $user->nodeMounts = \array_merge($roots, [$nodeId]);
+        $user->nodeMounts = array_merge($roots, [$nodeId]);
     }
 
     /**
