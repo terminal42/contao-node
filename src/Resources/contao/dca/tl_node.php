@@ -3,7 +3,7 @@
 /*
  * Node Bundle for Contao Open Source CMS.
  *
- * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
  * @author     terminal42 <https://terminal42.ch>
  * @license    MIT
  */
@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
     'list' => [
         'sorting' => [
             'mode' => 5,
-            'icon' => 'filemanager.svg', // @todo
+            'icon' => 'folderC.svg',
             'paste_button_callback' => ['terminal42_node.listener.data_container', 'onPasteButtonCallback'],
             'panelLayout' => 'filter;search',
         ],
@@ -56,20 +56,29 @@ $GLOBALS['TL_DCA']['tl_node'] = [
         'operations' => [
             'edit' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['edit'],
-                'href' => 'act=edit',
+                'href' => 'table=tl_content',
                 'icon' => 'edit.svg',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onEditButtonCallback'],
+            ],
+            'editheader' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_node']['editheader'],
+                'href' => 'act=edit',
+                'icon' => 'header.svg',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onEditHeaderButtonCallback'],
             ],
             'copy' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['copy'],
                 'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onCopyButtonCallback'],
             ],
             'copyChilds' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['copyChilds'],
                 'href' => 'act=paste&amp;mode=copy&amp;childs=1',
                 'icon' => 'copychilds.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onCopyChildsButtonCallback'],
             ],
             'cut' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['cut'],
@@ -82,6 +91,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\''.$GLOBALS['TL_LANG']['MSC']['deleteConfirm'].'\'))return false;Backend.getScrollOffset()"',
+                'button_callback' => ['terminal42_node.listener.data_container', 'onDeleteButtonCallback'],
             ],
             'show' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_node']['show'],
@@ -93,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
 
     // Palettes
     'palettes' => [
-        'default' => '{name_legend},name,type;{filter_legend},languages',
+        'default' => '{name_legend},name,type;{filter_legend},languages,tags',
     ],
 
     // Fields
@@ -102,12 +112,15 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'autoincrement' => true],
         ],
         'pid' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['pid'],
+            'foreignKey' => 'tl_node.name',
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'sorting' => [
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'tstamp' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['tstamp'],
             'sql' => ['type' => 'integer', 'unsigned' => true, 'default' => 0],
         ],
         'name' => [
@@ -128,7 +141,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 \Terminal42\NodeBundle\Model\NodeModel::TYPE_FOLDER,
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_node']['typeRef'],
-            'eval' => ['submitOnChange' => true, 'tl_class' => 'w50'],
+            'eval' => ['tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 7, 'default' => ''],
         ],
         'languages' => [
@@ -139,6 +152,13 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'options_callback' => ['terminal42_node.listener.data_container', 'onLanguagesOptionsCallback'],
             'eval' => ['multiple' => true, 'chosen' => true, 'csv' => ',', 'tl_class' => 'clr'],
             'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
+        ],
+        'tags' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['tags'],
+            'exclude' => true,
+            'filter' => true,
+            'inputType' => 'cfgTags',
+            'eval' => ['tagsManager' => 'terminal42_node', 'tl_class' => 'clr'],
         ],
     ],
 ];

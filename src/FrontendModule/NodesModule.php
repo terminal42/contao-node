@@ -3,16 +3,16 @@
 /*
  * Node Bundle for Contao Open Source CMS.
  *
- * @copyright  Copyright (c) 2018, terminal42 gmbh
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
  * @author     terminal42 <https://terminal42.ch>
  * @license    MIT
  */
 
 namespace Terminal42\NodeBundle\FrontendModule;
 
-use Contao\BackendTemplate;
 use Contao\Module;
-use Patchwork\Utf8;
+use Contao\StringUtil;
+use Contao\System;
 
 class NodesModule extends Module
 {
@@ -24,22 +24,25 @@ class NodesModule extends Module
     protected $strTemplate = 'mod_nodes';
 
     /**
+     * @var array
+     */
+    protected $nodes;
+
+    /**
      * Display a wildcard in the back end.
      *
      * @return string
      */
     public function generate()
     {
-        if (TL_MODE === 'BE') {
-            $template = new BackendTemplate('be_wildcard');
+        if (0 === \count($ids = StringUtil::deserialize($this->objModel->nodes, true))) {
+            return '';
+        }
 
-            $template->wildcard = '### '.Utf8::strtoupper($GLOBALS['TL_LANG']['FMD'][$this->type][0]).' ###';
-            $template->title = $this->headline;
-            $template->id = $this->id;
-            $template->link = $this->name;
-            $template->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id='.$this->id;
+        $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
 
-            return $template->parse();
+        if (0 === \count($this->nodes)) {
+            return '';
         }
 
         return parent::generate();
@@ -50,5 +53,6 @@ class NodesModule extends Module
      */
     protected function compile()
     {
+        $this->Template->nodes = $this->nodes;
     }
 }

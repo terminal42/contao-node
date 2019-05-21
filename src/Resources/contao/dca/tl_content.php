@@ -1,13 +1,17 @@
 <?php
 
 /*
- * Dynamically add the permission check and parent table
+ * Node Bundle for Contao Open Source CMS.
+ *
+ * @copyright  Copyright (c) 2019, terminal42 gmbh
+ * @author     terminal42 <https://terminal42.ch>
+ * @license    MIT
  */
-if (\Contao\Input::get('do') === 'nodes') {
+
+if ('nodes' === \Contao\Input::get('do')) {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_node';
-    // @todo
-//    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = array('tl_content_news', 'checkPermission');
-//    $GLOBALS['TL_DCA']['tl_content']['list']['operations']['toggle']['button_callback'] = array('tl_content_news', 'toggleIcon');
+    $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = ['terminal42_node.listener.content', 'onLoadCallback'];
+    $GLOBALS['TL_DCA']['tl_content']['list']['sorting']['headerFields'] = ['pid', 'name', 'tstamp'];
 }
 
 /*
@@ -21,7 +25,10 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['nodes'] = '{type_legend},type;{inc
 $GLOBALS['TL_DCA']['tl_content']['fields']['nodes'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_content']['nodes'],
     'exclude' => true,
-    'inputType' => 'nodeTree',
+    'inputType' => 'nodePicker',
     'eval' => ['mandatory' => true, 'multiple' => true, 'fieldType' => 'checkbox', 'tl_class' => 'clr'],
     'sql' => ['type' => 'blob', 'notnull' => false],
+    'save_callback' => [
+        ['terminal42_node.listener.content', 'onNodesSaveCallback'],
+    ],
 ];

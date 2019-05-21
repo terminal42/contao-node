@@ -1,14 +1,54 @@
 services:
+    terminal42_node.manager:
+        class: Terminal42\NodeBundle\NodeManager
+        public: true
+
+    terminal42_node.listener.content:
+        class: Terminal42\NodeBundle\EventListener\ContentListener
+        public: true
+        arguments:
+            - "@database_connection"
+            - "@terminal42_node.permission_checker"
+
     terminal42_node.listener.data_container:
         class: Terminal42\NodeBundle\EventListener\DataContainerListener
         public: true
         arguments:
             - "@database_connection"
-            - "@contao.framework"
+            - "@monolog.logger.contao"
+            - "@terminal42_node.permission_checker"
             - "@session"
+            - "@terminal42_node.tags_manager"
 
     terminal42_node.listener.insert_tags:
         class: Terminal42\NodeBundle\EventListener\InsertTagsListener
         public: true
         arguments:
+            - "@terminal42_node.manager"
+
+    terminal42_node.permission_checker:
+        class: Terminal42\NodeBundle\PermissionChecker
+        public: false
+        arguments:
+            - "@database_connection"
+            - "@security.token_storage"
+
+    terminal42_node.picker:
+        class: Terminal42\NodeBundle\Picker\NodePickerProvider
+        public: false
+        arguments:
+            - "@knp_menu.factory"
+            - "@router"
+        calls:
+            - [setTokenStorage, ["@security.token_storage"]]
+        tags:
+            - { name: contao.picker_provider, priority: 132 }
+
+    terminal42_node.tags_manager:
+        class: Codefog\TagsBundle\Manager\DefaultManager
+        arguments:
             - "@contao.framework"
+            - "tl_node"
+            - "tags"
+        tags:
+            - { name: codefog_tags.manager, alias: terminal42_node }
