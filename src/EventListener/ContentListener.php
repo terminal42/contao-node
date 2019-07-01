@@ -59,14 +59,14 @@ class ContentListener
     /**
      * On nodes fields save callback.
      *
-     * @param string        $value
+     * @param string|null   $value
      * @param DataContainer $dc
      *
      * @throws \InvalidArgumentException
      *
      * @return string
      */
-    public function onNodesSaveCallback(string $value, DataContainer $dc): string
+    public function onNodesSaveCallback(?string $value, DataContainer $dc): string
     {
         $ids = (array) StringUtil::deserialize($value, true);
 
