@@ -25,3 +25,7 @@ tags to be able to quickly filter and find them again. Both the languages as wel
 on the front end but can help you to manage your content in an efficient way.
 
 Thanks to the Contao picker, finding the correct node is as easy as it can get!
+
+## Insert Tags
+
+The extension also provides two new insert tags: `{{insert_node::*}}` and `{{insert_nodes::*}}`. The former expects the ID of a node and will then generate the output of that node. The latter expects a comma separated list of node IDs and will then generate the output of all those nodes. Example: `{{insert_nodes::1,2,3}}`
