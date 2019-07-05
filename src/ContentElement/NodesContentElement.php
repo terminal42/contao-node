@@ -10,9 +10,12 @@
 
 namespace Terminal42\NodeBundle\ContentElement;
 
+use Contao\BackendTemplate;
 use Contao\ContentElement;
 use Contao\StringUtil;
 use Contao\System;
+use Patchwork\Utf8;
+use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodesContentElement extends ContentElement
 {
@@ -50,6 +53,11 @@ class NodesContentElement extends ContentElement
             return '';
         }
 
+        // Display the backend wildcard
+        if (TL_MODE === 'BE') {
+            return static::generateBackendWildcard($this->arrData, $ids);
+        }
+
         $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
 
         if (0 === \count($this->nodes)) {
@@ -65,5 +73,50 @@ class NodesContentElement extends ContentElement
     protected function compile()
     {
         $this->Template->nodes = $this->nodes;
+    }
+
+    /**
+     * Generate a wildcard in the backend
+     *
+     * @param array $data
+     * @param array $ids
+     *
+     * @return string
+     */
+    public static function generateBackendWildcard(array $data, array $ids): string
+    {
+        $nodes = [];
+
+        $nodeModels = NodeModel::findBy(
+            ['id IN ('.implode(',', $ids).')', 'type=?'],
+            [NodeModel::TYPE_CONTENT, implode(',', $ids)],
+            ['order' => 'FIND_IN_SET(`id`, ?)']
+        );
+
+        if ($nodeModels !== null) {
+            $router = System::getContainer()->get('router');
+
+            /** @var NodeModel $nodeModel */
+            foreach ($nodeModels as $nodeModel) {
+                $nodes[] = sprintf(
+                    '<a href="%s" class="tl_gray" target="_blank">%s (ID: %s)</a>',
+                    $router->generate('contao_backend', ['do' => 'nodes', 'table' => 'tl_content', 'id' => $nodeModel->id]),
+                    $nodeModel->name,
+                    $nodeModel->id
+                );
+            }
+        }
+
+        $wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD'][$data['type']][0]) . ' ###';
+
+        // Add nodes
+        if (count($nodes) > 0) {
+            $wildcard .= '<br><p>' . implode('<br>', $nodes) . '</p>';
+        }
+
+        $template = new BackendTemplate('be_wildcard');
+        $template->wildcard = $wildcard;
+
+        return $template->parse();
     }
 }
