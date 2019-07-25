@@ -13,6 +13,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
     'config' => [
         'label' => &$GLOBALS['TL_LANG']['MOD']['nodes'][0],
         'dataContainer' => 'Table',
+        'ctable' => ['tl_content'],
         'enableVersioning' => true,
         'markAsCopy' => 'name',
         'onload_callback' => [
