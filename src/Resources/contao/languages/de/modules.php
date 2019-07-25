@@ -11,7 +11,7 @@
 /*
  * Backend modules
  */
-$GLOBALS['TL_LANG']['MOD']['nodes'] = ['Nodes', 'Nodes mit Inhaltselmenten erzeugen und verwalten.'];
+$GLOBALS['TL_LANG']['MOD']['nodes'] = ['Nodes', 'Nodes mit Inhaltselementen erzeugen und verwalten.'];
 
 /*
  * Frontend modules
