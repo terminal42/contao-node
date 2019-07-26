@@ -1,1 +1,9 @@
+<?php if ($this->nodesWrapper): ?>
+    <div<?php if ($this->class): ?> class="<?= $this->class ?>"<?php endif; ?><?= $this->cssID ?>>
+<?php endif; ?>
+
 <?= implode("\n", $this->nodes) ?>
+
+<?php if ($this->nodesWrapper): ?>
+    </div>
+<?php endif; ?>

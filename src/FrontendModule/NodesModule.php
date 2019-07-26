@@ -13,6 +13,7 @@ namespace Terminal42\NodeBundle\FrontendModule;
 use Contao\Module;
 use Contao\StringUtil;
 use Contao\System;
+use Terminal42\NodeBundle\ContentElement\NodesContentElement;
 
 class NodesModule extends Module
 {
@@ -37,6 +38,11 @@ class NodesModule extends Module
     {
         if (0 === \count($ids = StringUtil::deserialize($this->objModel->nodes, true))) {
             return '';
+        }
+
+        // Display the backend wildcard
+        if (TL_MODE === 'BE') {
+            return NodesContentElement::generateBackendWildcard($this->arrData, $ids);
         }
 
         $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
