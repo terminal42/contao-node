@@ -12,6 +12,7 @@ namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\DataContainer;
+use Contao\Input;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Terminal42\NodeBundle\Model\NodeModel;
@@ -44,16 +45,21 @@ class ContentListener
     /**
      * On data container load callback.
      */
-    public function onLoadCallback(): void
+    public function onLoadCallback(DataContainer $dc): void
     {
-        $node = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [CURRENT_ID]);
+        // Determine the node type
+        if ($dc->table === 'tl_content' && Input::get('act')) {
+            $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=(SELECT pid FROM tl_content WHERE id=? AND ptable=?)', [$dc->id, 'tl_node']);
+        } else {
+            $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
+        }
 
         // Throw an exception if the node is not present or is of a folder type
-        if (!$node || NodeModel::TYPE_FOLDER === $node) {
+        if (!$type || NodeModel::TYPE_FOLDER === $type) {
             throw new AccessDeniedException('Node of folder type cannot have content elements');
         }
 
-        $this->checkPermissions();
+        $this->checkPermissions($dc);
     }
 
     /**
@@ -92,14 +98,21 @@ class ContentListener
     /**
      * Check the permissions.
      */
-    private function checkPermissions(): void
+    private function checkPermissions(DataContainer $dc): void
     {
         if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT)) {
             throw new AccessDeniedException('The user is not allowed to manage the node content');
         }
 
-        if (!$this->permissionChecker->isUserAllowedNode(CURRENT_ID)) {
-            throw new AccessDeniedException(sprintf('The user is not allowed to manage the content of node ID %s', CURRENT_ID));
+        // Determine the node ID
+        if ($dc->table === 'tl_content' && Input::get('act')) {
+            $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$dc->id, 'tl_node']);
+        } else {
+            $nodeId = $dc->id;
+        }
+
+        if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
+            throw new AccessDeniedException(sprintf('The user is not allowed to manage the content of node ID %s', $nodeId));
         }
     }
 }
