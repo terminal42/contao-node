@@ -10,6 +10,10 @@
             "homepage": "https://terminal42.ch"
         }
     ],
+    "support": {
+        "issues": "https://github.com/terminal42/contao-node/issues",
+        "source": "https://github.com/terminal42/contao-node"
+    },
     "require": {
         "php": "^7.1",
         "contao/core-bundle": "^4.4",
