@@ -48,7 +48,7 @@ class ContentListener
     public function onLoadCallback(DataContainer $dc): void
     {
         // Determine the node type
-        if ($dc->table === 'tl_content' && 'edit' === Input::get('act')) {
+        if ($dc->table === 'tl_content' && Input::get('act') && Input::get('act') !== 'create') {
             $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=(SELECT pid FROM tl_content WHERE id=? AND ptable=?)', [$dc->id, 'tl_node']);
         } else {
             $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
