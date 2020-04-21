@@ -297,7 +297,7 @@ class DataContainerListener
         // Generate the tags
         if (\count($tagIds) > 0) {
             /** @var Tag $tag */
-            foreach ($this->tagsManager->findMultiple(['values' => $tagIds]) as $tag) {
+            foreach ($this->tagsManager->getFilteredTags($tagIds) as $tag) {
                 $tags[] = $tag->getName();
             }
         }

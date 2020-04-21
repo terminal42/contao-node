@@ -18,7 +18,7 @@ services:
             - "@monolog.logger.contao"
             - "@terminal42_node.permission_checker"
             - "@session"
-            - "@terminal42_node.tags_manager"
+            - "@codefog_tags.manager.terminal42_node"
 
     terminal42_node.listener.insert_tags:
         class: Terminal42\NodeBundle\EventListener\InsertTagsListener
@@ -43,12 +43,3 @@ services:
             - [setTokenStorage, ["@security.token_storage"]]
         tags:
             - { name: contao.picker_provider, priority: 132 }
-
-    terminal42_node.tags_manager:
-        class: Codefog\TagsBundle\Manager\DefaultManager
-        arguments:
-            - "@contao.framework"
-            - "tl_node"
-            - "tags"
-        tags:
-            - { name: codefog_tags.manager, alias: terminal42_node }

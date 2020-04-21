@@ -18,7 +18,7 @@
         "php": "^7.1",
         "contao/core-bundle": "^4.4",
         "codefog/contao-haste": "^4.21",
-        "codefog/tags-bundle": "^2.1"
+        "codefog/tags-bundle": "^3.0"
     },
     "require-dev": {
         "contao/manager-plugin": "^2.0",
