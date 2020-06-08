@@ -12,6 +12,7 @@ namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\StringUtil;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodeManager
@@ -82,11 +83,20 @@ class NodeManager
     {
         $buffer = '';
 
+        if ($nodeModel->wrapper) {
+            $cssID = StringUtil::deserialize($nodeModel->cssID, true);
+            $buffer .= '<div class="node_wrapper'.(!empty($cssID[1]) ? ' '.$cssID[1] : '').'"'.(!empty($cssID[0]) ? ' id="'.$cssID[0].'"' : '').'>';
+        }
+
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
             foreach ($elements as $element) {
                 $buffer .= Controller::getContentElement($element);
             }
+        }
+
+        if ($nodeModel->wrapper) {
+            $buffer .= '</div>';
         }
 
         return $buffer;
