@@ -12,6 +12,7 @@ namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Terminal42\NodeBundle\Model\NodeModel;
 
@@ -81,12 +82,8 @@ class NodeManager
      */
     private function generateBuffer(NodeModel $nodeModel): string
     {
+        $nodeTpl = 'node_default';
         $buffer = '';
-
-        if ($nodeModel->wrapper) {
-            $cssID = StringUtil::deserialize($nodeModel->cssID, true);
-            $buffer .= '<div class="node_wrapper'.(!empty($cssID[1]) ? ' '.$cssID[1] : '').'"'.(!empty($cssID[0]) ? ' id="'.$cssID[0].'"' : '').'>';
-        }
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
@@ -95,10 +92,19 @@ class NodeManager
             }
         }
 
-        if ($nodeModel->wrapper) {
-            $buffer .= '</div>';
+        if (!$nodeModel->wrapper) {
+            return $buffer;
         }
 
-        return $buffer;
+        $template = new FrontendTemplate($nodeModel->nodeTpl ?: $nodeTpl);
+        $template->setData($nodeModel->row());
+
+        $cssID = StringUtil::deserialize($nodeModel->cssID, true);
+
+        $template->class = !empty($cssID[1]) ? $cssID[1] : '';
+        $template->cssID = !empty($cssID[0]) ? $cssID[0] : '';
+        $template->buffer = $buffer;
+
+        return $template->parse();
     }
 }

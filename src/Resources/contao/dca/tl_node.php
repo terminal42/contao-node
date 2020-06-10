@@ -110,7 +110,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
 
     // Subpalettes
     'subpalettes' => [
-        'wrapper' => 'cssID',
+        'wrapper' => 'nodeTpl,cssID',
     ],
 
     // Fields
@@ -158,11 +158,20 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
             'sql' => ['type' => 'string', 'length' => 1, 'default' => ''],
         ],
+        'nodeTpl' => [
+            'exclude' => true,
+            'inputType' => 'select',
+            'options_callback' => static function () {
+                return Contao\Controller::getTemplateGroup('node_');
+            },
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'string', 'length' => 64, 'defualt' => ''],
+        ],
         'cssID' => [
             'label' => &$GLOBALS['TL_LANG']['tl_node']['cssID'],
             'exclude' => true,
             'inputType' => 'text',
-            'eval' => ['multiple' => true, 'size' => 2, 'tl_class' => 'w50 clr'],
+            'eval' => ['multiple' => true, 'size' => 2, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 255, 'defualt' => ''],
         ],
         'languages' => [
