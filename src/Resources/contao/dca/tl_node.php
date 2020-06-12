@@ -165,14 +165,14 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 return Contao\Controller::getTemplateGroup('node_');
             },
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
-            'sql' => ['type' => 'string', 'length' => 64, 'defualt' => ''],
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => ''],
         ],
         'cssID' => [
             'label' => &$GLOBALS['TL_LANG']['tl_node']['cssID'],
             'exclude' => true,
             'inputType' => 'text',
             'eval' => ['multiple' => true, 'size' => 2, 'tl_class' => 'w50'],
-            'sql' => ['type' => 'string', 'length' => 255, 'defualt' => ''],
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
         ],
         'languages' => [
             'label' => &$GLOBALS['TL_LANG']['tl_node']['languages'],

@@ -82,7 +82,6 @@ class NodeManager
      */
     private function generateBuffer(NodeModel $nodeModel): string
     {
-        $nodeTpl = 'node_default';
         $buffer = '';
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
@@ -96,7 +95,7 @@ class NodeManager
             return $buffer;
         }
 
-        $template = new FrontendTemplate($nodeModel->nodeTpl ?: $nodeTpl);
+        $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
         $template->setData($nodeModel->row());
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
