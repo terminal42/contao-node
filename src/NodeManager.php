@@ -12,6 +12,8 @@ namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
 use Contao\Controller;
+use Contao\FrontendTemplate;
+use Contao\StringUtil;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodeManager
@@ -89,6 +91,19 @@ class NodeManager
             }
         }
 
-        return $buffer;
+        if (!$nodeModel->wrapper) {
+            return $buffer;
+        }
+
+        $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
+        $template->setData($nodeModel->row());
+
+        $cssID = StringUtil::deserialize($nodeModel->cssID, true);
+
+        $template->class = !empty($cssID[1]) ? $cssID[1] : '';
+        $template->cssID = !empty($cssID[0]) ? $cssID[0] : '';
+        $template->buffer = $buffer;
+
+        return $template->parse();
     }
 }

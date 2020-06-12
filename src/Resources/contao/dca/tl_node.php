@@ -104,7 +104,13 @@ $GLOBALS['TL_DCA']['tl_node'] = [
 
     // Palettes
     'palettes' => [
-        'default' => '{name_legend},name,type;{filter_legend},languages,tags',
+        '__selector__' => ['wrapper'],
+        'default' => '{name_legend},name,type;{wrapper_legend},wrapper;{filter_legend},languages,tags',
+    ],
+
+    // Subpalettes
+    'subpalettes' => [
+        'wrapper' => 'nodeTpl,cssID',
     ],
 
     // Fields
@@ -144,6 +150,29 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'reference' => &$GLOBALS['TL_LANG']['tl_node']['typeRef'],
             'eval' => ['tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 7, 'default' => ''],
+        ],
+        'wrapper' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['wrapper'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'clr'],
+            'sql' => ['type' => 'string', 'length' => 1, 'default' => ''],
+        ],
+        'nodeTpl' => [
+            'exclude' => true,
+            'inputType' => 'select',
+            'options_callback' => static function () {
+                return Contao\Controller::getTemplateGroup('node_');
+            },
+            'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => ''],
+        ],
+        'cssID' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['cssID'],
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => ['multiple' => true, 'size' => 2, 'tl_class' => 'w50'],
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => ''],
         ],
         'languages' => [
             'label' => &$GLOBALS['TL_LANG']['tl_node']['languages'],
