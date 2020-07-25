@@ -86,7 +86,8 @@ class NodeManager
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
-            foreach ($elements as $element) {
+            foreach ($elements as $key => $element) {
+                $element->index = $key;
                 $buffer .= Controller::getContentElement($element);
             }
         }
@@ -97,6 +98,7 @@ class NodeManager
 
         $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
         $template->setData($nodeModel->row());
+        $template->elements = $elements;
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
