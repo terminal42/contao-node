@@ -83,11 +83,15 @@ class NodeManager
     private function generateBuffer(NodeModel $nodeModel): string
     {
         $buffer = '';
+        $arrElementsData = [];
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
             foreach ($elements as $key => $element) {
-                $element->index = $key;
+                $arrElementsData[$key] = array_merge($element->row(), [
+                    'node_sequence' => $key,
+                ]);
+                $element->setRow($arrElementsData[$key]);
                 $buffer .= Controller::getContentElement($element);
             }
         }
@@ -98,7 +102,7 @@ class NodeManager
 
         $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
         $template->setData($nodeModel->row());
-        $template->elements = $elements;
+        $template->arrElementsData = $arrElementsData;
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
