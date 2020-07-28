@@ -83,10 +83,13 @@ class NodeManager
     private function generateBuffer(NodeModel $nodeModel): string
     {
         $buffer = '';
+        $elementsData = [];
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
-            foreach ($elements as $element) {
+            foreach ($elements as $index => $element) {
+                $elementsData[] = $element->row();
+                $element->nodeElementIndex = $index;
                 $buffer .= Controller::getContentElement($element);
             }
         }
@@ -97,6 +100,7 @@ class NodeManager
 
         $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
         $template->setData($nodeModel->row());
+        $template->elementsData = $elementsData;
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
