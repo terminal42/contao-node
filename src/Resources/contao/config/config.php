@@ -13,6 +13,8 @@
  */
 $GLOBALS['BE_MOD']['content']['nodes'] = [
     'tables' => ['tl_node', 'tl_content'],
+    'table' => &$GLOBALS['BE_MOD']['content']['article']['table'],
+    'list' => &$GLOBALS['BE_MOD']['content']['article']['list'],
 ];
 
 /*
