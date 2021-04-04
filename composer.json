@@ -15,7 +15,7 @@
         "source": "https://github.com/terminal42/contao-node"
     },
     "require": {
-        "php": "^7.1",
+        "php": ">=7.1",
         "contao/core-bundle": "^4.4",
         "codefog/contao-haste": "^4.21",
         "codefog/tags-bundle": "^3.0"
