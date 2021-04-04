@@ -126,7 +126,7 @@ class DataContainerListener
         }
 
         // Disable paste into if the node is of content type
-        if (!$disablePI && isset($row['type']) && NodeModel::TYPE_CONTENT === $row['type']) {
+        if (!$disablePI && NodeModel::TYPE_CONTENT === ($row['type'] ?? '')) {
             $disablePI = true;
         }
 
@@ -197,7 +197,7 @@ class DataContainerListener
      */
     public function onCopyButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
     {
-        if (isset($GLOBALS['TL_DCA'][$table]['config']['closed']) && $GLOBALS['TL_DCA'][$table]['config']['closed']) {
+        if ($GLOBALS['TL_DCA'][$table]['config']['closed'] ?? null) {
             return '';
         }
 
@@ -219,7 +219,7 @@ class DataContainerListener
      */
     public function onCopyChildsButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
     {
-        if (isset($GLOBALS['TL_DCA'][$table]['config']['closed']) && $GLOBALS['TL_DCA'][$table]['config']['closed']) {
+        if ($GLOBALS['TL_DCA'][$table]['config']['closed'] ?? null) {
             return '';
         }
 
