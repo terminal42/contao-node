@@ -20,6 +20,8 @@ $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
 $GLOBALS['TL_LANG']['tl_node']['protected'] = ['Node schützen', 'Den node nur bestimmten Mitgliedergruppen anzeigen.'];
 $GLOBALS['TL_LANG']['tl_node']['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Gruppen können den Node sehen.'];
 $GLOBALS['TL_LANG']['tl_node']['guests'] = ['Nur Gästen anzeigen', 'Den Node verstecken, sobald ein Mitglied angemeldet ist.'];
+$GLOBALS['TL_LANG']['tl_node']['geoip_visibility'] = ['IP Geolokalisierung', 'Diesen Node für Besucher aus gewissen Ländern ein- oder ausblenden.'];
+$GLOBALS['TL_LANG']['tl_node']['geoip_countries'] = ['Länder', 'Wählen Sie die Länder welche diesen Node (nicht) sehen dürfen.'];
 
 /*
  * Legends

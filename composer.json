@@ -26,8 +26,12 @@
         "codefog/tags-bundle": "^3.0"
     },
     "require-dev": {
+        "terminal42/contao-geoip2-country": "^1.0",
         "contao/manager-plugin": "^2.0",
         "friendsofphp/php-cs-fixer": "^2.2"
+    },
+    "suggest": {
+        "terminal42/contao-geoip2-country": "Protect nodes in Contao using MaxMind GeoIP2 database"
     },
     "conflict": {
         "contao/manager-plugin": "<2.0 || >=3.0"
