@@ -104,13 +104,14 @@ $GLOBALS['TL_DCA']['tl_node'] = [
 
     // Palettes
     'palettes' => [
-        '__selector__' => ['wrapper'],
-        'default' => '{name_legend},name,type;{wrapper_legend},wrapper;{filter_legend},languages,tags',
+        '__selector__' => ['wrapper', 'protected'],
+        'default' => '{name_legend},name,type;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:hide},protected,guests',
     ],
 
     // Subpalettes
     'subpalettes' => [
         'wrapper' => 'nodeTpl,cssID',
+        'protected' => 'groups',
     ],
 
     // Fields
@@ -189,6 +190,29 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'filter' => true,
             'inputType' => 'cfgTags',
             'eval' => ['tagsManager' => 'terminal42_node', 'tl_class' => 'clr'],
+        ],
+        'protected' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['protected'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['submitOnChange' => true],
+            'sql' => "char(1) NOT NULL default ''",
+        ],
+        'groups' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['groups'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'foreignKey' => 'tl_member_group.name',
+            'eval' => ['mandatory' => true, 'multiple' => true],
+            'sql' => "blob NULL",
+            'relation' => ['type' => 'hasMany', 'load' => 'lazy'],
+        ],
+        'guests' => [
+            'label' => &$GLOBALS['TL_LANG']['tl_node']['guests'],
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => ['tl_class' => 'clr'],
+            'sql' => "char(1) NOT NULL default ''",
         ],
     ],
 ];

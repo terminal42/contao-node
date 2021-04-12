@@ -82,6 +82,10 @@ class NodeManager
      */
     private function generateBuffer(NodeModel $nodeModel): string
     {
+        if (!Controller::isVisibleElement($nodeModel)) {
+            return '';
+        }
+
         $buffer = '';
         $elementsData = [];
 

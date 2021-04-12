@@ -17,6 +17,9 @@ $GLOBALS['TL_LANG']['tl_node']['languages'] = ['Sprachen', 'Hier können Sprache
 $GLOBALS['TL_LANG']['tl_node']['tags'] = ['Tags', 'Hier können Sie Tags für den Node vergeben, nach denen Im Backend gefiltert werden kann.'];
 $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Parent node'];
 $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
+$GLOBALS['TL_LANG']['tl_node']['protected'] = ['Node schützen', 'Den node nur bestimmten Mitgliedergruppen anzeigen.'];
+$GLOBALS['TL_LANG']['tl_node']['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Gruppen können den Node sehen.'];
+$GLOBALS['TL_LANG']['tl_node']['guests'] = ['Nur Gästen anzeigen', 'Den Node verstecken, sobald ein Mitglied angemeldet ist.'];
 
 /*
  * Legends

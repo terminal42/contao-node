@@ -17,6 +17,9 @@ $GLOBALS['TL_LANG']['tl_node']['languages'] = ['Languages', 'Here you can choose
 $GLOBALS['TL_LANG']['tl_node']['tags'] = ['Tags', 'Here you can enter the tags that will be used for filtering in the backend.'];
 $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Parent node'];
 $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
+$GLOBALS['TL_LANG']['tl_node']['protected'] = ['Protect node', 'Show the node to certain member groups only'];
+$GLOBALS['TL_LANG']['tl_node']['groups'] = ['Allowed member groups', 'These groups will be able to see the node'];
+$GLOBALS['TL_LANG']['tl_node']['guests'] = ['Show to guests only', 'Hide the node if a member is logged in.'];
 
 /*
  * Legends
@@ -24,6 +27,7 @@ $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
 $GLOBALS['TL_LANG']['tl_node']['name_legend'] = 'Name and type';
 $GLOBALS['TL_LANG']['tl_node']['filter_legend'] = 'Filter settings';
 $GLOBALS['TL_LANG']['tl_node']['wrapper_legend'] = 'Wrapper settings';
+$GLOBALS['TL_LANG']['tl_node']['protected_legend'] = 'Access protection';
 
 /*
  * Reference
