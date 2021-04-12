@@ -4,12 +4,17 @@
     "keywords": ["contao", "node", "content"],
     "type": "contao-bundle",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "terminal42",
-            "homepage": "https://terminal42.ch"
-        }
-    ],
+    "authors": [{
+        "name": "terminal42 gmbh",
+        "homepage": "https://www.terminal42.ch"
+    }],
+    "funding": [{
+        "type": "github",
+        "url": "https://github.com/terminal42"
+    }, {
+        "type": "other",
+        "url": "https://ko-fi.com/terminal42"
+    }],
     "support": {
         "issues": "https://github.com/terminal42/contao-node/issues",
         "source": "https://github.com/terminal42/contao-node"
