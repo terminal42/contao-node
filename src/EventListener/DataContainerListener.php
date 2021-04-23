@@ -406,7 +406,7 @@ class DataContainerListener
 
         // Limit the allowed roots for the user
         if (null !== ($roots = $this->permissionChecker->getUserAllowedRoots())) {
-            if (isset($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && \is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
+            if (!empty($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && \is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
                 $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
             } else {
                 $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;

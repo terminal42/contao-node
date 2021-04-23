@@ -86,7 +86,13 @@ class PermissionChecker
             return null;
         }
 
-        return array_map('intval', (array) $this->getUser()->nodeMounts);
+        $ids = array_map('intval', (array) $this->getUser()->nodeMounts);
+
+        if (empty($ids)) {
+            return [0];
+        }
+
+        return $ids;
     }
 
     /**
