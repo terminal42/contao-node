@@ -25,6 +25,7 @@ services:
         public: true
         arguments:
             - "@terminal42_node.manager"
+            - "@?logger"
 
     terminal42_node.permission_checker:
         class: Terminal42\NodeBundle\PermissionChecker
