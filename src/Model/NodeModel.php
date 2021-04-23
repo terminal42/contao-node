@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -12,6 +14,7 @@ namespace Terminal42\NodeBundle\Model;
 
 use Contao\ContentModel;
 use Contao\Model;
+use Contao\Model\Collection;
 
 class NodeModel extends Model
 {
@@ -30,10 +33,8 @@ class NodeModel extends Model
 
     /**
      * Get the content elements.
-     *
-     * @return Model\Collection|null
      */
-    public function getContentElements(): ?Model\Collection
+    public function getContentElements(): ?Collection
     {
         return ContentModel::findPublishedByPidAndTable($this->id, static::getTable());
     }

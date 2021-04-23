@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -41,9 +43,6 @@ class PermissionChecker
 
     /**
      * PermissionChecker constructor.
-     *
-     * @param Connection            $db
-     * @param TokenStorageInterface $tokenStorage
      */
     public function __construct(Connection $db, TokenStorageInterface $tokenStorage)
     {
@@ -53,8 +52,6 @@ class PermissionChecker
 
     /**
      * Return true if the user is admin.
-     *
-     * @return bool
      */
     public function isUserAdmin(): bool
     {
@@ -63,10 +60,6 @@ class PermissionChecker
 
     /**
      * Return true if the user has permission.
-     *
-     * @param string $permission
-     *
-     * @return bool
      */
     public function hasUserPermission(string $permission): bool
     {
@@ -86,8 +79,6 @@ class PermissionChecker
 
     /**
      * Get the user allowed roots. Return null if the user has no limitation.
-     *
-     * @return array|null
      */
     public function getUserAllowedRoots(): ?array
     {
@@ -100,10 +91,6 @@ class PermissionChecker
 
     /**
      * Return if the user is allowed to manage the node.
-     *
-     * @param int $nodeId
-     *
-     * @return bool
      */
     public function isUserAllowedNode(int $nodeId): bool
     {
@@ -124,8 +111,6 @@ class PermissionChecker
 
     /**
      * Add the node to allowed roots.
-     *
-     * @param int $nodeIds
      */
     public function addNodeToAllowedRoots(int $nodeId): void
     {
@@ -170,11 +155,6 @@ class PermissionChecker
 
     /**
      * Filter the allowed IDs.
-     *
-     * @param array  $ids
-     * @param string $permission
-     *
-     * @return array
      */
     public function filterAllowedIds(array $ids, string $permission): array
     {

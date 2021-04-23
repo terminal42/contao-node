@@ -32,14 +32,11 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
         ];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getExtensionConfig($extensionName, array $extensionConfigs, ContainerBuilder $container)
     {
-        if ($extensionName === 'codefog_tags' && !isset($extensionConfigs[0]['managers']['terminal42_node'])) {
+        if ('codefog_tags' === $extensionName && !isset($extensionConfigs[0]['managers']['terminal42_node'])) {
             $extensionConfigs[0]['managers']['terminal42_node'] = [
-                'source' => 'tl_node.tags'
+                'source' => 'tl_node.tags',
             ];
         }
 

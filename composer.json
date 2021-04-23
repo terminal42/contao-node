@@ -28,7 +28,7 @@
     "require-dev": {
         "terminal42/contao-geoip2-country": "^1.0",
         "contao/manager-plugin": "^2.0",
-        "friendsofphp/php-cs-fixer": "^2.2"
+        "contao/easy-coding-standard": "^3.0"
     },
     "suggest": {
         "terminal42/contao-geoip2-country": "Protect nodes in Contao using MaxMind GeoIP2 database"
@@ -43,5 +43,10 @@
     },
     "extra": {
         "contao-manager-plugin": "Terminal42\\NodeBundle\\ContaoManager\\Plugin"
+    },
+    "scripts": {
+        "cs-fixer": [
+            "vendor/bin/ecs check src/ --fix --ansi"
+        ]
     }
 }

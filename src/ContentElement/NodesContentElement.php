@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -68,20 +70,7 @@ class NodesContentElement extends ContentElement
     }
 
     /**
-     * Generate the module.
-     */
-    protected function compile()
-    {
-        $this->Template->nodes = $this->nodes;
-    }
-
-    /**
-     * Generate a wildcard in the backend
-     *
-     * @param array $data
-     * @param array $ids
-     *
-     * @return string
+     * Generate a wildcard in the backend.
      */
     public static function generateBackendWildcard(array $data, array $ids): string
     {
@@ -93,7 +82,7 @@ class NodesContentElement extends ContentElement
             ['order' => 'FIND_IN_SET(`id`, ?)']
         );
 
-        if ($nodeModels !== null) {
+        if (null !== $nodeModels) {
             $router = System::getContainer()->get('router');
 
             /** @var NodeModel $nodeModel */
@@ -107,16 +96,24 @@ class NodesContentElement extends ContentElement
             }
         }
 
-        $wildcard = '### ' . Utf8::strtoupper($GLOBALS['TL_LANG']['FMD'][$data['type']][0]) . ' ###';
+        $wildcard = '### '.Utf8::strtoupper($GLOBALS['TL_LANG']['FMD'][$data['type']][0]).' ###';
 
         // Add nodes
-        if (count($nodes) > 0) {
-            $wildcard .= '<br><p>' . implode('<br>', $nodes) . '</p>';
+        if (\count($nodes) > 0) {
+            $wildcard .= '<br><p>'.implode('<br>', $nodes).'</p>';
         }
 
         $template = new BackendTemplate('be_wildcard');
         $template->wildcard = $wildcard;
 
         return $template->parse();
+    }
+
+    /**
+     * Generate the module.
+     */
+    protected function compile(): void
+    {
+        $this->Template->nodes = $this->nodes;
     }
 }

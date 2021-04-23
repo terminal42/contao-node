@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -57,7 +59,7 @@ class NodesModule extends Module
     /**
      * Generate the module.
      */
-    protected function compile()
+    protected function compile(): void
     {
         $this->Template->nodes = $this->nodes;
     }

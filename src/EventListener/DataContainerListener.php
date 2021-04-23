@@ -70,20 +70,9 @@ class DataContainerListener
 
     /**
      * DataContainerListener constructor.
-     *
-     * @param Connection        $db
-     * @param LoggerInterface   $logger
-     * @param PermissionChecker $permissionChecker
-     * @param SessionInterface  $session
-     * @param ManagerInterface  $tagsManager
      */
-    public function __construct(
-        Connection $db,
-        LoggerInterface $logger,
-        PermissionChecker $permissionChecker,
-        SessionInterface $session,
-        ManagerInterface $tagsManager
-    ) {
+    public function __construct(Connection $db, LoggerInterface $logger, PermissionChecker $permissionChecker, SessionInterface $session, ManagerInterface $tagsManager)
+    {
         $this->db = $db;
         $this->logger = $logger;
         $this->permissionChecker = $permissionChecker;
@@ -93,8 +82,6 @@ class DataContainerListener
 
     /**
      * On load callback.
-     *
-     * @param DataContainer $dc
      */
     public function onLoadCallback(DataContainer $dc): void
     {
@@ -106,13 +93,7 @@ class DataContainerListener
     /**
      * On paste button callback.
      *
-     * @param DataContainer $dc
-     * @param array         $row
-     * @param string        $table
-     * @param bool          $cr
-     * @param array|null    $clipboard
-     *
-     * @return string
+     * @param array|null $clipboard
      */
     public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, $clipboard = null): string
     {
@@ -150,15 +131,6 @@ class DataContainerListener
 
     /**
      * On "edit" button callback.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
      */
     public function onEditButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
@@ -167,15 +139,6 @@ class DataContainerListener
 
     /**
      * On "edit header" button callback.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
      */
     public function onEditHeaderButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
@@ -184,16 +147,6 @@ class DataContainerListener
 
     /**
      * On "copy" button callback.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     * @param string $table
-     *
-     * @return string
      */
     public function onCopyButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
     {
@@ -206,16 +159,6 @@ class DataContainerListener
 
     /**
      * On "copy childs" button callback.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     * @param string $table
-     *
-     * @return string
      */
     public function onCopyChildsButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
     {
@@ -235,15 +178,6 @@ class DataContainerListener
 
     /**
      * On "delete" button callback.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     *
-     * @return string
      */
     public function onDeleteButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
@@ -265,18 +199,10 @@ class DataContainerListener
 
     /**
      * On label callback.
-     *
-     * @param array              $row
-     * @param string             $label
-     * @param DataContainer|null $dc
-     * @param string             $imageAttribute
-     * @param bool               $returnImage
-     *
-     * @return string
      */
     public function onLabelCallback(array $row, string $label, DataContainer $dc = null, string $imageAttribute = '', bool $returnImage = false): string
     {
-        $image = (NodeModel::TYPE_CONTENT === $row['type']) ? 'articles.svg' : 'folderC.svg';
+        $image = NodeModel::TYPE_CONTENT === $row['type'] ? 'articles.svg' : 'folderC.svg';
 
         // Return the image only
         if ($returnImage) {
@@ -308,8 +234,8 @@ class DataContainerListener
             Backend::addToUrl('nn='.$row['id']),
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            (\count($languages) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
-            (\count($tags) > 0) ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : ''
+            \count($languages) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
+            \count($tags) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : ''
         );
     }
 
@@ -317,8 +243,6 @@ class DataContainerListener
      * On languages options callback.
      *
      * @param DataContainer|null $dc
-     *
-     * @return array
      */
     public function onLanguagesOptionsCallback(): array
     {
@@ -328,8 +252,7 @@ class DataContainerListener
     /**
      * On execute the post actions.
      *
-     * @param string        $action
-     * @param DataContainer $dc
+     * @param string $action
      */
     public function onExecutePostActions($action, DataContainer $dc): void
     {
@@ -340,16 +263,6 @@ class DataContainerListener
 
     /**
      * Generate the button.
-     *
-     * @param array  $row
-     * @param string $href
-     * @param string $label
-     * @param string $title
-     * @param string $icon
-     * @param string $attributes
-     * @param bool   $active
-     *
-     * @return string
      */
     private function generateButton(array $row, string $href, string $label, string $title, string $icon, string $attributes, bool $active): string
     {
@@ -362,8 +275,6 @@ class DataContainerListener
 
     /**
      * Reload the node picker widget.
-     *
-     * @param DataContainer $dc
      */
     private function reloadNodePickerWidget(DataContainer $dc): void
     {
@@ -442,8 +353,6 @@ class DataContainerListener
 
     /**
      * Toggle switchToEdit flag.
-     *
-     * @param DataContainer $dc
      */
     private function toggleSwitchToEditFlag(DataContainer $dc): void
     {
@@ -460,8 +369,6 @@ class DataContainerListener
 
     /**
      * Check the permissions.
-     *
-     * @param DataContainer $dc
      */
     private function checkPermissions(DataContainer $dc): void
     {
@@ -491,7 +398,7 @@ class DataContainerListener
         if (\is_array($session['CURRENT']['IDS'])) {
             $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
                 $session['CURRENT']['IDS'],
-                ('deleteAll' === Input::get('act')) ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
+                'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
             );
 
             $this->session->replace($session);
@@ -518,7 +425,7 @@ class DataContainerListener
 
                         // Dynamically add the record to the user profile
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                            /** @var \Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface $sessionBag */
+                            /** @var AttributeBagInterface $sessionBag */
                             $sessionBag = $this->session->getbag('contao_backend');
 
                             $newRecords = $sessionBag->get('new_records');
@@ -541,6 +448,7 @@ class DataContainerListener
                             throw new AccessDeniedException(sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
                         }
                         break;
+
                     case 'editAll':
                     case 'deleteAll':
                     case 'overrideAll':
@@ -556,8 +464,6 @@ class DataContainerListener
 
     /**
      * Add a breadcrumb menu.
-     *
-     * @param DataContainer $dc
      *
      * @throws \RuntimeException
      */
@@ -629,6 +535,7 @@ class DataContainerListener
         // Check whether the node is mounted
         if (!$user->hasAccess($ids, 'nodeMounts')) {
             $session->set(self::BREADCRUMB_SESSION_KEY, 0);
+
             throw new AccessDeniedException('Node ID '.$nodeId.' is not mounted.');
         }
 

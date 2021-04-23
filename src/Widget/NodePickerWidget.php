@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -56,7 +58,7 @@ class NodePickerWidget extends Widget
 
         $return = '<input type="hidden" name="'.$this->strName.'" id="ctrl_'.$this->strId.'" value="'.implode(',', array_keys($values)).'">
   <input type="hidden" name="'.$this->strOrderName.'" id="ctrl_'.$this->strOrderId.'" value="'.implode(',', array_keys($values)).'">
-  <div class="selector_container">'.((\count($values) > 1) ? '
+  <div class="selector_container">'.(\count($values) > 1 ? '
     <p class="sort_hint">'.$GLOBALS['TL_LANG']['MSC']['dragItemsHint'].'</p>' : '').'
     <ul id="sort_'.$this->strId.'" class="'.($this->sorting ? 'sortable' : '').'">';
 
@@ -127,7 +129,9 @@ class NodePickerWidget extends Widget
             }
 
             return '';
-        } elseif (false === strpos($input, ',')) {
+        }
+
+        if (false === strpos($input, ',')) {
             return $this->multiple ? [(int) $input] : (int) $input;
         }
 
@@ -141,7 +145,7 @@ class NodePickerWidget extends Widget
      *
      * @param string $input
      */
-    protected function checkValue($input)
+    protected function checkValue($input): void
     {
         if ('' === $input || !\is_array($this->rootNodes)) {
             return;

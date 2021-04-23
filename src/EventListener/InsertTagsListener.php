@@ -24,8 +24,6 @@ class InsertTagsListener
 
     /**
      * InsertTagsListener constructor.
-     *
-     * @param NodeManager $manager
      */
     public function __construct(NodeManager $manager)
     {
@@ -34,8 +32,6 @@ class InsertTagsListener
 
     /**
      * On replace insert tag.
-     *
-     * @param string $tag
      *
      * @return string|bool
      */
@@ -52,10 +48,6 @@ class InsertTagsListener
 
     /**
      * Generate the nodes.
-     *
-     * @param string $ids
-     *
-     * @return string
      */
     private function generateNodes(string $ids): string
     {

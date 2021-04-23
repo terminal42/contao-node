@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -20,10 +22,6 @@ class NodeManager
 {
     /**
      * Generate single node.
-     *
-     * @param int $id
-     *
-     * @return string|null
      */
     public function generateSingle(int $id): ?string
     {
@@ -40,10 +38,6 @@ class NodeManager
 
     /**
      * Generate multiple nodes.
-     *
-     * @param array $ids
-     *
-     * @return array
      */
     public function generateMultiple(array $ids): array
     {
@@ -75,10 +69,6 @@ class NodeManager
 
     /**
      * Generate the node buffer (content elements).
-     *
-     * @param NodeModel $nodeModel
-     *
-     * @return string
      */
     private function generateBuffer(NodeModel $nodeModel): string
     {

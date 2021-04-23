@@ -25,12 +25,12 @@ class Terminal42NodeExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        if (\class_exists(DcaLoaderListener::class)) {
+        if (class_exists(DcaLoaderListener::class)) {
             $definition = new Definition(DcaLoaderListener::class, [new Reference('database_connection'), new Reference('translator'), ['tl_node']]);
             $definition->addTag('contao.hook', ['hook' => 'loadDataContainer']);
             $container->setDefinition('terminal42_node.listener.geoip2country_dca_loader', $definition);

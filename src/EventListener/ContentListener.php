@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * Node Bundle for Contao Open Source CMS.
  *
@@ -32,9 +34,6 @@ class ContentListener
 
     /**
      * ContentListener constructor.
-     *
-     * @param Connection        $db
-     * @param PermissionChecker $permissionChecker
      */
     public function __construct(Connection $db, PermissionChecker $permissionChecker)
     {
@@ -55,7 +54,7 @@ class ContentListener
                 break;
 
             case 'paste':
-                if (Input::get('mode') === 'create') {
+                if ('create' === Input::get('mode')) {
                     $nodeId = $dc->id;
                 } else {
                     $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$dc->id, 'tl_node']);
@@ -67,7 +66,7 @@ class ContentListener
             case 'copyAll':
             case 'cut':
             case 'cutAll':
-                if ((int) Input::get('mode') === 1) {
+                if (1 === (int) Input::get('mode')) {
                     $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [Input::get('pid'), 'tl_node']);
                 } else {
                     $nodeId = Input::get('pid');
@@ -97,12 +96,7 @@ class ContentListener
     /**
      * On nodes fields save callback.
      *
-     * @param string|null   $value
-     * @param DataContainer $dc
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
     public function onNodesSaveCallback(?string $value, DataContainer $dc): string
     {
