@@ -64,7 +64,9 @@ class NodeManager
             $nodes[$nodeModel->id] = $this->generateBuffer($nodeModel);
         }
 
-        return array_filter($nodes);
+        return array_filter($nodes, static function ($buffer) {
+            return null !== $buffer;
+        });
     }
 
     /**

@@ -69,7 +69,7 @@ class InsertTagsListener
         }
 
         $nodes = $this->manager->generateMultiple($ids);
-        $invalid = array_diff_key(array_flip($ids), $nodes);
+        $invalid = array_keys(array_diff_key(array_flip($ids), $nodes));
 
         if (!empty($invalid)) {
             $this->logError($invalid, $tag);
@@ -85,7 +85,7 @@ class InsertTagsListener
         }
 
         $this->logger->error(
-            'Invalid node(s) '.implode(', ', $ids).' in insert tag ('.$tag.') on page ' . Environment::get('uri'),
+            'Invalid nodes ('.implode(', ', $ids).') in insert tag ('.$tag.') on page ' . Environment::get('uri'),
             ['contao' => new ContaoContext(self::class, ContaoContext::ERROR)]
         );
     }
