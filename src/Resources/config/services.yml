@@ -1,4 +1,6 @@
 services:
+    Terminal42\NodeBundle\NodeManager: '@terminal42_node.manager'
+
     terminal42_node.manager:
         class: Terminal42\NodeBundle\NodeManager
         public: true
