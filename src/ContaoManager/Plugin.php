@@ -40,6 +40,24 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
             ];
         }
 
+        if ('rocksolid_frontend_helper' === $extensionName &&  !isset($extensionConfigs[0]['backend_modules']['nodes'])) {
+            $extensionConfigs[0]['backend_modules']['nodes'] = [
+                'table' => 'tl_node',
+                'act' => 'edit',
+                'column' => 'nodes',
+                'column_type' => 'serialized',
+                'ce_column' => 'nodes',
+                'ce_column_type' => 'serialized',
+                'icon' => 'header.svg',
+                'content_elements' => [
+                    'nodes',
+                ],
+                'fe_modules' => [
+                    'nodes',
+                ],
+            ];
+        }
+
         return $extensionConfigs;
     }
 }
