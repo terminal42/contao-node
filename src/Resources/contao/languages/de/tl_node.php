@@ -11,8 +11,8 @@
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Name', 'Bitte einen internen Namen des Nodes vergeben.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Typ', 'Hier können Sie den Typ des Nodes auswählen.'];
 $GLOBALS['TL_LANG']['tl_node']['wrapper'] = ['Wrapper hinzufügen', 'Hier können Sie einen Wrapper um diesen Node ausgeben.'];
-$GLOBALS['TL_LANG']['tl_node']['nodeTpl'] = ['Node-Template', 'Hier können Sie ein Node-Template auswählen.'];
 $GLOBALS['TL_LANG']['tl_node']['cssID'] = ['CSS-ID/Klasse', 'Hier können Sie eine ID und beliebig viele Klassen eingeben.'];
+$GLOBALS['TL_LANG']['tl_node']['nodeTpl'] = ['Node-Template', 'Hier können Sie ein Node-Template auswählen.'];
 $GLOBALS['TL_LANG']['tl_node']['languages'] = ['Sprachen', 'Hier können Sprachen für den Noden eingestellt werden, nach denen im Backend gefiltert werden kann.'];
 $GLOBALS['TL_LANG']['tl_node']['tags'] = ['Tags', 'Hier können Sie Tags für den Node vergeben, nach denen Im Backend gefiltert werden kann.'];
 $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Parent node'];
@@ -29,6 +29,7 @@ $GLOBALS['TL_LANG']['tl_node']['geoip_countries'] = ['Länder', 'Wählen Sie die
 $GLOBALS['TL_LANG']['tl_node']['name_legend'] = 'Name und Typ';
 $GLOBALS['TL_LANG']['tl_node']['filter_legend'] = 'Filter Einstellungen';
 $GLOBALS['TL_LANG']['tl_node']['wrapper_legend'] = 'Wrapper Einstellungen';
+$GLOBALS['TL_LANG']['tl_node']['protected_legend'] = 'Zugriffsberechtigungen';
 
 /*
  * Reference
