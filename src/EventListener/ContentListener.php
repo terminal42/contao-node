@@ -50,14 +50,14 @@ class ContentListener
             case 'edit':
             case 'delete':
             case 'show':
-                $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$dc->id, 'tl_node']);
+                $nodeId = $this->db->fetchOne('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$dc->id, 'tl_node']);
                 break;
 
             case 'paste':
                 if ('create' === Input::get('mode')) {
                     $nodeId = $dc->id;
                 } else {
-                    $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$dc->id, 'tl_node']);
+                    $nodeId = $this->db->fetchOne('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$dc->id, 'tl_node']);
                 }
                 break;
 
@@ -67,7 +67,7 @@ class ContentListener
             case 'cut':
             case 'cutAll':
                 if (1 === (int) Input::get('mode')) {
-                    $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [Input::get('pid'), 'tl_node']);
+                    $nodeId = $this->db->fetchOne('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [Input::get('pid'), 'tl_node']);
                 } else {
                     $nodeId = Input::get('pid');
                 }
@@ -76,14 +76,14 @@ class ContentListener
             default:
                 // Ajax requests such as toggle
                 if (Input::get('cid')) {
-                    $nodeId = $this->db->fetchColumn('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [Input::get('cid'), 'tl_node']);
+                    $nodeId = $this->db->fetchOne('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [Input::get('cid'), 'tl_node']);
                 } else {
                     $nodeId = $dc->id;
                 }
                 break;
         }
 
-        $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [$nodeId]);
+        $type = $this->db->fetchOne('SELECT type FROM tl_node WHERE id=?', [$nodeId]);
 
         // Throw an exception if the node is not present or is of a folder type
         if (!$type || NodeModel::TYPE_FOLDER === $type) {
