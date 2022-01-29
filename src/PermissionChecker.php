@@ -128,7 +128,7 @@ class PermissionChecker
 
         // Add the permissions on group level
         if ('custom' !== $user->inherit) {
-            $groups = $this->db->fetchAll('SELECT id, nodeMounts, nodePermissions FROM tl_user_group WHERE id IN('.implode(',', array_map('intval', $user->groups)).')');
+            $groups = $this->db->fetchAllAssociative('SELECT id, nodeMounts, nodePermissions FROM tl_user_group WHERE id IN('.implode(',', array_map('intval', $user->groups)).')');
 
             foreach ($groups as $group) {
                 $permissions = StringUtil::deserialize($group['nodePermissions'], true);
