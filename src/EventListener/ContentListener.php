@@ -103,7 +103,7 @@ class ContentListener
         $ids = (array) StringUtil::deserialize($value, true);
 
         if (\count($ids) > 0) {
-            $folders = $this->db->fetchAll('SELECT name FROM tl_node WHERE id IN ('.implode(', ', $ids).') AND type=?', [NodeModel::TYPE_FOLDER]);
+            $folders = $this->db->fetchAllAssociative('SELECT name FROM tl_node WHERE id IN ('.implode(', ', $ids).') AND type=?', [NodeModel::TYPE_FOLDER]);
 
             // Do not allow folder nodes
             if (\count($folders) > 0) {
