@@ -305,7 +305,7 @@ class DataContainerListener
 
         // Load the value
         if ('overrideAll' !== Input::get('act') && $id > 0 && $this->db->getSchemaManager()->tablesExist([$dc->table])) {
-            $row = $this->db->fetchAssoc("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+            $row = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
             // The record does not exist
             if (!$row) {
@@ -501,7 +501,7 @@ class DataContainerListener
             $id = $nodeId;
 
             do {
-                $node = $this->db->fetchAssoc("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+                $node = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
                 if (!$node) {
                     // Currently selected node does not exist
