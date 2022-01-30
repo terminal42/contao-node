@@ -144,7 +144,7 @@ class PermissionChecker
 
         // Add the permissions on user level
         if ('group' !== $user->inherit) {
-            $userData = $this->db->fetchAssoc('SELECT nodePermissions, nodeMounts FROM tl_user WHERE id=?', [$user->id]);
+            $userData = $this->db->fetchAssociative('SELECT nodePermissions, nodeMounts FROM tl_user WHERE id=?', [$user->id]);
             $permissions = StringUtil::deserialize($userData['nodePermissions'], true);
 
             if (\in_array(self::PERMISSION_CREATE, $permissions, true)) {
