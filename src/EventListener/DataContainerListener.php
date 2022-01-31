@@ -170,7 +170,7 @@ class DataContainerListener
 
         // Make the button active only if there are subnodes
         if ($active) {
-            $active = $this->db->fetchColumn("SELECT COUNT(*) FROM $table WHERE pid=?", [$row['id']]) > 0;
+            $active = $this->db->fetchOne("SELECT COUNT(*) FROM $table WHERE pid=?", [$row['id']]) > 0;
         }
 
         return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
@@ -305,7 +305,7 @@ class DataContainerListener
 
         // Load the value
         if ('overrideAll' !== Input::get('act') && $id > 0 && $this->db->getSchemaManager()->tablesExist([$dc->table])) {
-            $row = $this->db->fetchAssoc("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+            $row = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
             // The record does not exist
             if (!$row) {
@@ -360,7 +360,7 @@ class DataContainerListener
             return;
         }
 
-        $type = $this->db->fetchColumn('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
+        $type = $this->db->fetchOne('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
 
         if (NodeModel::TYPE_CONTENT === $type) {
             $GLOBALS['TL_DCA'][$dc->table]['config']['switchToEdit'] = true;
@@ -501,7 +501,7 @@ class DataContainerListener
             $id = $nodeId;
 
             do {
-                $node = $this->db->fetchAssoc("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+                $node = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
                 if (!$node) {
                     // Currently selected node does not exist
