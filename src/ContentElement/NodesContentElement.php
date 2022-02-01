@@ -16,6 +16,7 @@ use Contao\BackendTemplate;
 use Contao\ContentElement;
 use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\String\UnicodeString;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodesContentElement extends ContentElement
@@ -95,7 +96,8 @@ class NodesContentElement extends ContentElement
             }
         }
 
-        $wildcard = '### '.$GLOBALS['TL_LANG']['FMD'][$data['type']][0].' ###';
+		$type = new UnicodeString($GLOBALS['TL_LANG']['FMD'][$data['type']][0]);
+        $wildcard = '### '.$type->upper().' ###';
 
         // Add nodes
         if (\count($nodes) > 0) {
