@@ -16,7 +16,6 @@ use Contao\BackendTemplate;
 use Contao\ContentElement;
 use Contao\StringUtil;
 use Contao\System;
-use Patchwork\Utf8;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodesContentElement extends ContentElement
@@ -96,7 +95,7 @@ class NodesContentElement extends ContentElement
             }
         }
 
-        $wildcard = '### '.Utf8::strtoupper($GLOBALS['TL_LANG']['FMD'][$data['type']][0]).' ###';
+        $wildcard = '### '.$GLOBALS['TL_LANG']['FMD'][$data['type']][0].' ###';
 
         // Add nodes
         if (\count($nodes) > 0) {
