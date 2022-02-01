@@ -96,8 +96,7 @@ class NodesContentElement extends ContentElement
             }
         }
 
-		$type = new UnicodeString($GLOBALS['TL_LANG']['FMD'][$data['type']][0]);
-        $wildcard = '### '.$type->upper().' ###';
+        $wildcard = '### '.(new UnicodeString($GLOBALS['TL_LANG']['FMD'][$data['type']][0]))->upper().' ###';
 
         // Add nodes
         if (\count($nodes) > 0) {
