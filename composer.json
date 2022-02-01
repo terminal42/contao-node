@@ -25,7 +25,7 @@
         "codefog/contao-haste": "^4.21",
         "codefog/tags-bundle": "^3.0",
         "doctrine/dbal": "^2.13 || ^3.0",
-        "symfony/string": "^5.4"
+        "symfony/string": "^5.4 || ^6.0"
     },
     "require-dev": {
         "terminal42/contao-geoip2-country": "^1.0",
