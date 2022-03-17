@@ -75,8 +75,8 @@ class ContentListener
 
             default:
                 // Ajax requests such as toggle
-                if (Input::get('cid')) {
-                    $nodeId = $this->db->fetchOne('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [Input::get('cid'), 'tl_node']);
+                if (Input::get('field') && ($id = Input::get('cid') ?: Input::get('id'))) {
+                    $nodeId = $this->db->fetchOne('SELECT pid FROM tl_content WHERE id=? AND ptable=?', [$id, 'tl_node']);
                 } else {
                     $nodeId = $dc->id;
                 }
