@@ -318,12 +318,12 @@ class DataContainerListener
                 throw new BadRequestHttpException('Bad request');
             }
 
-            $value = $row->$field;
+            $value = $row[$field];
             $dc->activeRecord = $row;
         }
 
         // Call the load_callback
-        if (\is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'])) {
+        if (\is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] ?? null)) {
             foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$field]['load_callback'] as $callback) {
                 if (\is_array($callback)) {
                     $value = System::importStatic($callback[0])->{$callback[1]}($value, $dc);
