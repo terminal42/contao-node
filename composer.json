@@ -4,23 +4,28 @@
     "keywords": ["contao", "node", "content"],
     "type": "contao-bundle",
     "license": "MIT",
-    "authors": [{
-        "name": "terminal42 gmbh",
-        "homepage": "https://www.terminal42.ch"
-    }],
-    "funding": [{
-        "type": "github",
-        "url": "https://github.com/terminal42"
-    }, {
-        "type": "other",
-        "url": "https://ko-fi.com/terminal42"
-    }],
+    "authors": [
+        {
+            "name": "terminal42 gmbh",
+            "homepage": "https://www.terminal42.ch"
+        }
+    ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/terminal42"
+        },
+        {
+            "type": "other",
+            "url": "https://ko-fi.com/terminal42"
+        }
+    ],
     "support": {
         "issues": "https://github.com/terminal42/contao-node/issues",
         "source": "https://github.com/terminal42/contao-node"
     },
     "require": {
-        "php": ">=7.1",
+        "php": "^7.1 || ^8.0",
         "contao/core-bundle": "^4.4",
         "codefog/contao-haste": "^4.21",
         "codefog/tags-bundle": "^3.0",
@@ -28,8 +33,7 @@
     },
     "require-dev": {
         "terminal42/contao-geoip2-country": "^1.0",
-        "contao/manager-plugin": "^2.0",
-        "contao/easy-coding-standard": "^3.0"
+        "contao/manager-plugin": "^2.0"
     },
     "suggest": {
         "terminal42/contao-geoip2-country": "Protect nodes in Contao using MaxMind GeoIP2 database"
@@ -46,8 +50,6 @@
         "contao-manager-plugin": "Terminal42\\NodeBundle\\ContaoManager\\Plugin"
     },
     "scripts": {
-        "cs-fixer": [
-            "vendor/bin/ecs check src/ --fix --ansi"
-        ]
+        "cs-fixer": "tools/ecs/vendor/bin/ecs check src/ --fix --ansi"
     }
 }

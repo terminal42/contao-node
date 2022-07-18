@@ -40,7 +40,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
             ];
         }
 
-        if ('rocksolid_frontend_helper' === $extensionName &&  !isset($extensionConfigs[0]['backend_modules']['nodes'])) {
+        if ('rocksolid_frontend_helper' === $extensionName && !isset($extensionConfigs[0]['backend_modules']['nodes'])) {
             $extensionConfigs[0]['backend_modules']['nodes'] = [
                 'table' => 'tl_node',
                 'act' => 'edit',

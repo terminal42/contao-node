@@ -85,7 +85,7 @@ class InsertTagsListener
         }
 
         $this->logger->error(
-            'Invalid nodes ('.implode(', ', $ids).') in insert tag ('.$tag.') on page ' . Environment::get('uri'),
+            'Invalid nodes ('.implode(', ', $ids).') in insert tag ('.$tag.') on page '.Environment::get('uri'),
             ['contao' => new ContaoContext(self::class, ContaoContext::ERROR)]
         );
     }
