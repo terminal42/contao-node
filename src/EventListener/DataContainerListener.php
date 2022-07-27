@@ -395,7 +395,7 @@ class DataContainerListener
         $session = $this->session->all();
 
         // Filter allowed page IDs
-        if (\is_array($session['CURRENT']['IDS'])) {
+        if (\is_array($session['CURRENT']['IDS'] ?? null)) {
             $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
                 $session['CURRENT']['IDS'],
                 'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
