@@ -26,9 +26,9 @@
     },
     "require": {
         "php": "^7.1 || ^8.0",
-        "contao/core-bundle": "^4.4",
-        "codefog/contao-haste": "^4.21",
-        "codefog/tags-bundle": "^3.0",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "codefog/contao-haste": "5.x-dev@dev",
+        "codefog/tags-bundle": "dev-haste-5@dev",
         "doctrine/dbal": "^2.13 || ^3.0"
     },
     "require-dev": {
@@ -51,5 +51,10 @@
     },
     "scripts": {
         "cs-fixer": "tools/ecs/vendor/bin/ecs check src/ --fix --ansi"
+    },
+    "config": {
+        "allow-plugins": {
+            "ocramius/package-versions": true
+        }
     }
 }
