@@ -21,7 +21,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function getDcaTable()
+    public function getDcaTable(PickerConfig $config = null): string
     {
         return 'tl_node';
     }
@@ -29,7 +29,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function getDcaAttributes(PickerConfig $config)
+    public function getDcaAttributes(PickerConfig $config): array
     {
         $attributes = ['fieldType' => 'checkbox'];
 
@@ -51,7 +51,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function convertDcaValue(PickerConfig $config, $value)
+    public function convertDcaValue(PickerConfig $config, mixed $value): int|string
     {
         return (int) $value;
     }
@@ -59,7 +59,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'nodePicker';
     }
@@ -67,7 +67,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function supportsContext($context)
+    public function supportsContext(string $context): bool
     {
         return 'node' === $context;
     }
@@ -75,7 +75,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function supportsValue(PickerConfig $config)
+    public function supportsValue(PickerConfig $config): bool
     {
         foreach (explode(',', $config->getValue()) as $id) {
             if (!is_numeric($id)) {
@@ -89,7 +89,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    protected function getRouteParameters(PickerConfig $config = null)
+    protected function getRouteParameters(PickerConfig $config = null): array
     {
         return ['do' => 'nodes'];
     }
