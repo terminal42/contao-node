@@ -42,7 +42,6 @@ services:
         arguments:
             - "@knp_menu.factory"
             - "@router"
-        calls:
-            - [setTokenStorage, ["@security.token_storage"]]
+            - "@translator"
         tags:
             - { name: contao.picker_provider, priority: 132 }
