@@ -28,7 +28,7 @@
         "php": "^7.4 || ^8.0",
         "contao/core-bundle": "^4.13 || ^5.0",
         "codefog/contao-haste": "5.x-dev@dev",
-        "codefog/tags-bundle": "dev-haste-5@dev",
+        "codefog/tags-bundle": "^5.0",
         "doctrine/dbal": "^2.13 || ^3.0"
     },
     "require-dev": {
