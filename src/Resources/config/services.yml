@@ -19,7 +19,7 @@ services:
             - "@database_connection"
             - "@monolog.logger.contao"
             - "@terminal42_node.permission_checker"
-            - "@session"
+            - "@request_stack"
             - "@codefog_tags.manager.terminal42_node"
 
     terminal42_node.listener.insert_tags:

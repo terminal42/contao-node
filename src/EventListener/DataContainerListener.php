@@ -31,9 +31,9 @@ use Contao\Validator;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Terminal42\NodeBundle\Model\NodeModel;
 use Terminal42\NodeBundle\PermissionChecker;
@@ -59,9 +59,9 @@ class DataContainerListener
     private $permissionChecker;
 
     /**
-     * @var SessionInterface
+     * @var RequestStack
      */
-    private $session;
+    private $requestStack;
 
     /**
      * @var ManagerInterface
@@ -71,12 +71,12 @@ class DataContainerListener
     /**
      * DataContainerListener constructor.
      */
-    public function __construct(Connection $db, LoggerInterface $logger, PermissionChecker $permissionChecker, SessionInterface $session, ManagerInterface $tagsManager)
+    public function __construct(Connection $db, LoggerInterface $logger, PermissionChecker $permissionChecker, RequestStack $requestStack, ManagerInterface $tagsManager)
     {
         $this->db = $db;
         $this->logger = $logger;
         $this->permissionChecker = $permissionChecker;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->tagsManager = $tagsManager;
     }
 
@@ -392,7 +392,7 @@ class DataContainerListener
             $GLOBALS['TL_DCA'][$dc->table]['config']['notDeletable'] = true;
         }
 
-        $session = $this->session->all();
+        $session = $this->requestStack->getSession()->all();
 
         // Filter allowed page IDs
         if (\is_array($session['CURRENT']['IDS'] ?? null)) {
@@ -401,7 +401,7 @@ class DataContainerListener
                 'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
             );
 
-            $this->session->replace($session);
+            $this->requestStack->getSession()->replace($session);
         }
 
         // Limit the allowed roots for the user
@@ -426,7 +426,7 @@ class DataContainerListener
                         // Dynamically add the record to the user profile
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
                             /** @var AttributeBagInterface $sessionBag */
-                            $sessionBag = $this->session->getbag('contao_backend');
+                            $sessionBag = $this->requestStack->getSession()->getbag('contao_backend');
 
                             $newRecords = $sessionBag->get('new_records');
                             $newRecords = \is_array($newRecords[$dc->table]) ? array_map('intval', $newRecords[$dc->table]) : [];
@@ -454,7 +454,7 @@ class DataContainerListener
                     case 'overrideAll':
                         if (\is_array($session['CURRENT']['IDS'])) {
                             $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $roots);
-                            $this->session->replace($session);
+                            $this->requestStack->getSession()->replace($session);
                         }
                         break;
                 }
@@ -470,7 +470,7 @@ class DataContainerListener
     private function addBreadcrumb(DataContainer $dc): void
     {
         /** @var AttributeBagInterface $session */
-        $session = $this->session->getBag('contao_backend');
+        $session = $this->requestStack->getSession()->getBag('contao_backend');
 
         // Set a new node
         if (isset($_GET['nn'])) {
