@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Terminal42\NodeBundle\EventListener;
 
+use Codefog\HasteBundle\Model\DcaRelationsModel;
 use Codefog\TagsBundle\Manager\ManagerInterface;
 use Codefog\TagsBundle\Tag;
 use Contao\Backend;
@@ -28,7 +29,6 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Haste\Model\Model;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Response;
@@ -218,7 +218,7 @@ class DataContainerListener
         }
 
         $tags = [];
-        $tagIds = Model::getRelatedValues('tl_node', 'tags', $row['id']);
+        $tagIds = DcaRelationsModel::getRelatedValues('tl_node', 'tags', $row['id']);
 
         // Generate the tags
         if (\count($tagIds) > 0) {
