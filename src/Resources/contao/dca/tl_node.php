@@ -32,6 +32,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
         'sorting' => [
             'mode' => 5,
             'icon' => 'folderC.svg',
+            'rootPaste' => true,
             'paste_button_callback' => ['terminal42_node.listener.data_container', 'onPasteButtonCallback'],
             'panelLayout' => 'filter;search',
         ],

@@ -17,6 +17,7 @@ services:
         public: true
         arguments:
             - "@database_connection"
+            - "@contao.intl.locales"
             - "@monolog.logger.contao"
             - "@terminal42_node.permission_checker"
             - "@request_stack"

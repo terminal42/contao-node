@@ -20,6 +20,7 @@ use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
+use Contao\CoreBundle\Intl\Locales;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DataContainer;
 use Contao\Environment;
@@ -49,6 +50,11 @@ class DataContainerListener
     private $db;
 
     /**
+     * @var Locales
+     */
+    private $locales;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -68,12 +74,10 @@ class DataContainerListener
      */
     private $tagsManager;
 
-    /**
-     * DataContainerListener constructor.
-     */
-    public function __construct(Connection $db, LoggerInterface $logger, PermissionChecker $permissionChecker, RequestStack $requestStack, ManagerInterface $tagsManager)
+    public function __construct(Connection $db, Locales $locales, LoggerInterface $logger, PermissionChecker $permissionChecker, RequestStack $requestStack, ManagerInterface $tagsManager)
     {
         $this->db = $db;
+        $this->locales = $locales;
         $this->logger = $logger;
         $this->permissionChecker = $permissionChecker;
         $this->requestStack = $requestStack;
@@ -92,10 +96,8 @@ class DataContainerListener
 
     /**
      * On paste button callback.
-     *
-     * @param array|null $clipboard
      */
-    public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, $clipboard = null): string
+    public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array $clipboard = null): string
     {
         $disablePA = false;
         $disablePI = false;
@@ -210,7 +212,7 @@ class DataContainerListener
         }
 
         $languages = [];
-        $allLanguages = System::getLanguages();
+        $allLanguages = $this->locales->getLocales(null, true);
 
         // Generate the languages
         foreach (StringUtil::trimsplit(',', $row['languages']) as $language) {
@@ -246,7 +248,7 @@ class DataContainerListener
      */
     public function onLanguagesOptionsCallback(): array
     {
-        return System::getLanguages();
+        return $this->locales->getLocales(null, true);
     }
 
     /**
