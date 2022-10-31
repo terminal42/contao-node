@@ -80,7 +80,7 @@ class NodePickerWidget extends Widget
             }
 
             $return .= '
-	<p><a href="'.ampersand($pickerBuilder->getUrl('node', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a></p>
+	<p><a href="'.StringUtil::ampersand($pickerBuilder->getUrl('node', $extras)).'" class="tl_submit" id="pt_'.$this->strName.'">'.$GLOBALS['TL_LANG']['MSC']['changeSelection'].'</a></p>
 	<script>
 	  $("pt_'.$this->strName.'").addEvent("click", function(e) {
 		e.preventDefault();
@@ -95,7 +95,7 @@ class NodePickerWidget extends Widget
 				$("ctrl_'.$this->strId.'").getParent("div").set("html", json.content);
 				json.javascript && Browser.exec(json.javascript);
 			  }
-			}).post({"action":"reloadNodePickerWidget", "name":"'.$this->strId.'", "value":value.join("\t"), "REQUEST_TOKEN":"'.REQUEST_TOKEN.'"});
+			}).post({"action":"reloadNodePickerWidget", "name":"'.$this->strId.'", "value":value.join("\t"), "REQUEST_TOKEN":"'.System::getContainer()->get('contao.csrf.token_manager')->getDefaultTokenValue().'"});
 		  }
 		});
 	  });

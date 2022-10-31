@@ -549,7 +549,7 @@ class DataContainerListener
         $links = array_reverse($links);
 
         // Insert breadcrumb menu
-        $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['breadcrumb'] .= '
+        $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['breadcrumb'] = '
 
 <nav aria-label="'.$GLOBALS['TL_LANG']['MSC']['breadcrumbMenu'].'">
   <ul id="tl_breadcrumb">
