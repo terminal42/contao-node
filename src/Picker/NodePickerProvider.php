@@ -51,7 +51,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function convertDcaValue(PickerConfig $config, mixed $value): int|string
+    public function convertDcaValue(PickerConfig $config, $value)
     {
         return (int) $value;
     }
@@ -67,7 +67,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
     /**
      * {@inheritdoc}
      */
-    public function supportsContext(string $context): bool
+    public function supportsContext($context): bool
     {
         return 'node' === $context;
     }
