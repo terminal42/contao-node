@@ -168,7 +168,7 @@ class PermissionChecker
             return [];
         }
 
-        return array_filter($ids, [$this, 'isUserAllowedNode']);
+        return array_filter(array_map('intval', $ids), [$this, 'isUserAllowedNode']);
     }
 
     /**
