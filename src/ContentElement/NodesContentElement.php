@@ -14,8 +14,11 @@ namespace Terminal42\NodeBundle\ContentElement;
 
 use Contao\BackendTemplate;
 use Contao\ContentElement;
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodesContentElement extends ContentElement
@@ -47,16 +50,32 @@ class NodesContentElement extends ContentElement
 
         // Check for potential circular reference
         if ('tl_node' === $this->objModel->ptable && \in_array((int) $this->objModel->pid, $ids, true)) {
-            if (TL_MODE === 'BE') {
-                return sprintf('<strong class="tl_red">%s</strong>', $GLOBALS['TL_LANG']['ERR']['circularReference']);
+            /** @var Request $request */
+            $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
+            if ($request !== null) {
+                /** @var ScopeMatcher $scopeMatcher */
+                $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
+
+                if ($scopeMatcher->isBackendRequest($request)) {
+                    return sprintf('<strong class="tl_red">%s</strong>', $GLOBALS['TL_LANG']['ERR']['circularReference']);
+                }
             }
 
             return '';
         }
 
+        /** @var Request $request */
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
         // Display the backend wildcard
-        if (TL_MODE === 'BE') {
-            return static::generateBackendWildcard($this->arrData, $ids);
+        if ($request !== null) {
+            /** @var ScopeMatcher $scopeMatcher */
+            $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
+
+            if ($scopeMatcher->isBackendRequest($request)) {
+                return static::generateBackendWildcard($this->arrData, $ids);
+            }
         }
 
         $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);

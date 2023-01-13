@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace Terminal42\NodeBundle\FrontendModule;
 
+use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\Module;
 use Contao\StringUtil;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 use Terminal42\NodeBundle\ContentElement\NodesContentElement;
 
 class NodesModule extends Module
@@ -42,9 +44,17 @@ class NodesModule extends Module
             return '';
         }
 
+        /** @var Request $request */
+        $request = System::getContainer()->get('request_stack')->getCurrentRequest();
+
         // Display the backend wildcard
-        if (TL_MODE === 'BE') {
-            return NodesContentElement::generateBackendWildcard($this->arrData, $ids);
+        if ($request !== null) {
+            /** @var ScopeMatcher $scopeMatcher */
+            $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
+
+            if ($scopeMatcher->isBackendRequest($request)) {
+                return NodesContentElement::generateBackendWildcard($this->arrData, $ids);
+            }
         }
 
         $this->nodes = System::getContainer()->get('terminal42_node.manager')->generateMultiple($ids);
