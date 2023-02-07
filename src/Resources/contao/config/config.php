@@ -12,7 +12,7 @@
  * Backend modules
  */
 $GLOBALS['BE_MOD']['content']['nodes'] = [
-    'tables' => ['tl_node', 'tl_content'],
+    'tables' => array_values(array_unique(array_merge(['tl_node', 'tl_content'], $GLOBALS['BE_MOD']['content']['article']['tables'] ?? []))),
     'table' => &$GLOBALS['BE_MOD']['content']['article']['table'],
     'list' => &$GLOBALS['BE_MOD']['content']['article']['list'],
 ];
