@@ -94,6 +94,8 @@ class NodesContentElement extends ContentElement
     {
         $nodes = [];
 
+        $ids = array_map('intval', $ids);
+
         $nodeModels = NodeModel::findBy(
             ['id IN ('.implode(',', $ids).')', 'type=?'],
             [NodeModel::TYPE_CONTENT, implode(',', $ids)],

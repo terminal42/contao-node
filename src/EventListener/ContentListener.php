@@ -101,6 +101,7 @@ class ContentListener
     public function onNodesSaveCallback(?string $value, DataContainer $dc): string
     {
         $ids = (array) StringUtil::deserialize($value, true);
+        $ids = array_map('intval', $ids);
 
         if (\count($ids) > 0) {
             $folders = $this->db->fetchAllAssociative('SELECT name FROM tl_node WHERE id IN ('.implode(', ', $ids).') AND type=?', [NodeModel::TYPE_FOLDER]);
