@@ -98,7 +98,7 @@ class ContentListener
      *
      * @throws \InvalidArgumentException
      */
-    public function onNodesSaveCallback(?string $value, DataContainer $dc): string
+    public function onNodesSaveCallback(?string $value, DataContainer $dc): ?string
     {
         $ids = (array) StringUtil::deserialize($value, true);
         $ids = array_map('intval', $ids);
