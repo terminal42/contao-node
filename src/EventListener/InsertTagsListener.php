@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -21,22 +13,12 @@ use Terminal42\NodeBundle\NodeManager;
 class InsertTagsListener
 {
     /**
-     * @var NodeManager
-     */
-    private $manager;
-
-    /**
-     * @var LoggerInterface|null
-     */
-    private $logger;
-
-    /**
      * InsertTagsListener constructor.
      */
-    public function __construct(NodeManager $manager, LoggerInterface $logger = null)
-    {
-        $this->manager = $manager;
-        $this->logger = $logger;
+    public function __construct(
+        private NodeManager $manager,
+        private LoggerInterface|null $logger = null,
+    ) {
     }
 
     /**
@@ -86,7 +68,7 @@ class InsertTagsListener
 
         $this->logger->error(
             'Invalid nodes ('.implode(', ', $ids).') in insert tag ('.$tag.') on page '.Environment::get('uri'),
-            ['contao' => new ContaoContext(self::class, ContaoContext::ERROR)]
+            ['contao' => new ContaoContext(self::class, ContaoContext::ERROR)],
         );
     }
 }

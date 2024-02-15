@@ -1,15 +1,10 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Contao\Controller;
+use Contao\System;
 
-\Contao\Controller::loadDataContainer('tl_content');
-\Contao\System::loadLanguageFile('tl_content');
+Controller::loadDataContainer('tl_content');
+System::loadLanguageFile('tl_content');
 
 /*
  * Palettes

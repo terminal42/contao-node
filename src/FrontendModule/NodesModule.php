@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\FrontendModule;
 
 use Contao\CoreBundle\Routing\ScopeMatcher;
@@ -48,7 +40,7 @@ class NodesModule extends Module
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
         // Display the backend wildcard
-        if ($request !== null) {
+        if (null !== $request) {
             /** @var ScopeMatcher $scopeMatcher */
             $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
 

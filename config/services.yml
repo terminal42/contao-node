@@ -35,7 +35,7 @@ services:
         public: false
         arguments:
             - "@database_connection"
-            - "@security.token_storage"
+            - "@security.helper"
 
     terminal42_node.picker:
         class: Terminal42\NodeBundle\Picker\NodePickerProvider

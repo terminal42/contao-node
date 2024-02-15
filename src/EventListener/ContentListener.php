@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\EventListener;
 
 use Contao\CoreBundle\Exception\AccessDeniedException;
@@ -23,22 +15,12 @@ use Terminal42\NodeBundle\PermissionChecker;
 class ContentListener
 {
     /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var PermissionChecker
-     */
-    private $permissionChecker;
-
-    /**
      * ContentListener constructor.
      */
-    public function __construct(Connection $db, PermissionChecker $permissionChecker)
-    {
-        $this->db = $db;
-        $this->permissionChecker = $permissionChecker;
+    public function __construct(
+        private Connection $db,
+        private PermissionChecker $permissionChecker,
+    ) {
     }
 
     /**
@@ -98,7 +80,7 @@ class ContentListener
      *
      * @throws \InvalidArgumentException
      */
-    public function onNodesSaveCallback(?string $value, DataContainer $dc): ?string
+    public function onNodesSaveCallback(string|null $value, DataContainer $dc): string|null
     {
         $ids = (array) StringUtil::deserialize($value, true);
         $ids = array_map('intval', $ids);

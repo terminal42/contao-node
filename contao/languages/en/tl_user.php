@@ -1,12 +1,6 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Terminal42\NodeBundle\PermissionChecker;
 
 $GLOBALS['TL_LANG']['tl_user']['nodeMounts'] = ['Node mounts', 'Here you can grant access to one or more nodes (subnodes are included automatically).'];
 $GLOBALS['TL_LANG']['tl_user']['nodePermissions'] = ['Node permissions', 'Here you can define the node permissions.'];
@@ -15,11 +9,11 @@ $GLOBALS['TL_LANG']['tl_user']['nodePermissions'] = ['Node permissions', 'Here y
  * Reference
  */
 $GLOBALS['TL_LANG']['tl_user']['nodePermissionsRef'] = [
-    \Terminal42\NodeBundle\PermissionChecker::PERMISSION_CREATE => 'Create nodes',
-    \Terminal42\NodeBundle\PermissionChecker::PERMISSION_EDIT => 'Edit nodes',
-    \Terminal42\NodeBundle\PermissionChecker::PERMISSION_DELETE => 'Delete nodes',
-    \Terminal42\NodeBundle\PermissionChecker::PERMISSION_CONTENT => 'Manage content',
-    \Terminal42\NodeBundle\PermissionChecker::PERMISSION_ROOT => 'Manage root nodes',
+    PermissionChecker::PERMISSION_CREATE => 'Create nodes',
+    PermissionChecker::PERMISSION_EDIT => 'Edit nodes',
+    PermissionChecker::PERMISSION_DELETE => 'Delete nodes',
+    PermissionChecker::PERMISSION_CONTENT => 'Manage content',
+    PermissionChecker::PERMISSION_ROOT => 'Manage root nodes',
 ];
 
 /*

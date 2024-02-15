@@ -1,12 +1,9 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Terminal42\NodeBundle\ContentElement\NodesContentElement;
+use Terminal42\NodeBundle\FrontendModule\NodesModule;
+use Terminal42\NodeBundle\Model\NodeModel;
+use Terminal42\NodeBundle\Widget\NodePickerWidget;
 
 /*
  * Backend modules
@@ -20,22 +17,22 @@ $GLOBALS['BE_MOD']['content']['nodes'] = [
 /*
  * Back end form fields
  */
-$GLOBALS['BE_FFL']['nodePicker'] = \Terminal42\NodeBundle\Widget\NodePickerWidget::class;
+$GLOBALS['BE_FFL']['nodePicker'] = NodePickerWidget::class;
 
 /*
  * Frontend modules
  */
-$GLOBALS['FE_MOD']['miscellaneous']['nodes'] = \Terminal42\NodeBundle\FrontendModule\NodesModule::class;
+$GLOBALS['FE_MOD']['miscellaneous']['nodes'] = NodesModule::class;
 
 /*
  * Content elements
  */
-$GLOBALS['TL_CTE']['includes']['nodes'] = \Terminal42\NodeBundle\ContentElement\NodesContentElement::class;
+$GLOBALS['TL_CTE']['includes']['nodes'] = NodesContentElement::class;
 
 /*
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_node'] = \Terminal42\NodeBundle\Model\NodeModel::class;
+$GLOBALS['TL_MODELS']['tl_node'] = NodeModel::class;
 
 /*
  * Hooks

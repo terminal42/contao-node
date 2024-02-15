@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\Widget;
 
 use Contao\Database;
@@ -103,17 +95,11 @@ class NodePickerWidget extends Widget
 	<script>Backend.makeMultiSrcSortable("sort_'.$this->strId.'", "ctrl_'.$this->strId.'", "ctrl_'.$this->strId.'")</script>';
         }
 
-        $return = '<div>'.$return.'</div></div>';
-
-        return $return;
+        return '<div>'.$return.'</div></div>';
     }
 
     /**
      * Return an array if the "multiple" attribute is set.
-     *
-     * @param mixed $input
-     *
-     * @return mixed
      */
     protected function validator($input)
     {
@@ -131,7 +117,7 @@ class NodePickerWidget extends Widget
             return '';
         }
 
-        if (false === strpos($input, ',')) {
+        if (!str_contains($input, ',')) {
             return $this->multiple ? [(int) $input] : (int) $input;
         }
 
@@ -151,7 +137,7 @@ class NodePickerWidget extends Widget
             return;
         }
 
-        if (false === strpos($input, ',')) {
+        if (!str_contains($input, ',')) {
             $ids = [(int) $input];
         } else {
             $ids = array_map('intval', array_filter(explode(',', $input)));

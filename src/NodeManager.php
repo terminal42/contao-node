@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
@@ -23,7 +15,7 @@ class NodeManager
     /**
      * Generate single node.
      */
-    public function generateSingle(int $id): ?string
+    public function generateSingle(int $id): string|null
     {
         if (!$id) {
             return null;
@@ -52,7 +44,7 @@ class NodeManager
         $nodeModels = NodeModel::findBy(
             ['id IN ('.implode(',', $ids).')', 'type=?'],
             [NodeModel::TYPE_CONTENT, implode(',', $ids)],
-            ['order' => 'FIND_IN_SET(`id`, ?)']
+            ['order' => 'FIND_IN_SET(`id`, ?)'],
         );
 
         if (null === $nodeModels) {
@@ -66,9 +58,7 @@ class NodeManager
             $nodes[$nodeModel->id] = $this->generateBuffer($nodeModel);
         }
 
-        return array_filter($nodes, static function ($buffer) {
-            return null !== $buffer;
-        });
+        return array_filter($nodes, static fn ($buffer) => null !== $buffer);
     }
 
     /**

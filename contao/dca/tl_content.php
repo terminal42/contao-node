@@ -1,14 +1,8 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Contao\Input;
 
-if ('nodes' === \Contao\Input::get('do')) {
+if ('nodes' === Input::get('do')) {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_node';
     $GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = ['terminal42_node.listener.content', 'onLoadCallback'];
     $GLOBALS['TL_DCA']['tl_content']['list']['sorting']['headerFields'] = ['pid', 'name', 'tstamp'];

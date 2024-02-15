@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\ContentElement;
 
 use Contao\BackendTemplate;
@@ -18,7 +10,6 @@ use Contao\CoreBundle\Routing\ScopeMatcher;
 use Contao\StringUtil;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodesContentElement extends ContentElement
@@ -53,7 +44,7 @@ class NodesContentElement extends ContentElement
             /** @var Request $request */
             $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
-            if ($request !== null) {
+            if (null !== $request) {
                 /** @var ScopeMatcher $scopeMatcher */
                 $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
 
@@ -69,7 +60,7 @@ class NodesContentElement extends ContentElement
         $request = System::getContainer()->get('request_stack')->getCurrentRequest();
 
         // Display the backend wildcard
-        if ($request !== null) {
+        if (null !== $request) {
             /** @var ScopeMatcher $scopeMatcher */
             $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
 
@@ -99,7 +90,7 @@ class NodesContentElement extends ContentElement
         $nodeModels = NodeModel::findBy(
             ['id IN ('.implode(',', $ids).')', 'type=?'],
             [NodeModel::TYPE_CONTENT, implode(',', $ids)],
-            ['order' => 'FIND_IN_SET(`id`, ?)']
+            ['order' => 'FIND_IN_SET(`id`, ?)'],
         );
 
         if (null !== $nodeModels) {
@@ -111,7 +102,7 @@ class NodesContentElement extends ContentElement
                     '<a href="%s" class="tl_gray" target="_blank">%s (ID: %s)</a>',
                     $router->generate('contao_backend', ['do' => 'nodes', 'table' => 'tl_content', 'id' => $nodeModel->id]),
                     $nodeModel->name,
-                    $nodeModel->id
+                    $nodeModel->id,
                 );
             }
         }

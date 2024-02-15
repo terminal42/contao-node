@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\EventListener;
 
 use Codefog\HasteBundle\Model\DcaRelationsModel;
@@ -42,46 +34,16 @@ use Terminal42\NodeBundle\Widget\NodePickerWidget;
 
 class DataContainerListener
 {
-    const BREADCRUMB_SESSION_KEY = 'tl_node_node';
+    public const BREADCRUMB_SESSION_KEY = 'tl_node_node';
 
-    /**
-     * @var Connection
-     */
-    private $db;
-
-    /**
-     * @var Locales
-     */
-    private $locales;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var PermissionChecker
-     */
-    private $permissionChecker;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $tagsManager;
-
-    public function __construct(Connection $db, Locales $locales, LoggerInterface $logger, PermissionChecker $permissionChecker, RequestStack $requestStack, ManagerInterface $tagsManager)
-    {
-        $this->db = $db;
-        $this->locales = $locales;
-        $this->logger = $logger;
-        $this->permissionChecker = $permissionChecker;
-        $this->requestStack = $requestStack;
-        $this->tagsManager = $tagsManager;
+    public function __construct(
+        private Connection $db,
+        private Locales $locales,
+        private LoggerInterface $logger,
+        private PermissionChecker $permissionChecker,
+        private RequestStack $requestStack,
+        private ManagerInterface $tagsManager,
+    ) {
     }
 
     /**
@@ -97,7 +59,7 @@ class DataContainerListener
     /**
      * On paste button callback.
      */
-    public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array $clipboard = null): string
+    public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array|null $clipboard = null): string
     {
         $disablePA = false;
         $disablePI = false;
@@ -113,8 +75,9 @@ class DataContainerListener
             $disablePI = true;
         }
 
-        // Disable "paste after" button if the parent node is a root node and the user is not allowed
-        if (!$disablePA && !$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT) && (!$row['pid'] || (\in_array((int) $row['id'], $dc->rootIds, true)))) {
+        // Disable "paste after" button if the parent node is a root node and the user is
+        // not allowed
+        if (!$disablePA && !$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT) && (!$row['pid'] || \in_array((int) $row['id'], $dc->rootIds, true))) {
             $disablePA = true;
         }
 
@@ -202,7 +165,7 @@ class DataContainerListener
     /**
      * On label callback.
      */
-    public function onLabelCallback(array $row, string $label, DataContainer $dc = null, string $imageAttribute = '', bool $returnImage = false): string
+    public function onLabelCallback(array $row, string $label, DataContainer|null $dc = null, string $imageAttribute = '', bool $returnImage = false): string
     {
         $image = NodeModel::TYPE_CONTENT === $row['type'] ? 'articles.svg' : 'folderC.svg';
 
@@ -237,14 +200,12 @@ class DataContainerListener
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
             \count($languages) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
-            \count($tags) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : ''
+            \count($tags) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : '',
         );
     }
 
     /**
      * On languages options callback.
-     *
-     * @param DataContainer|null $dc
      */
     public function onLanguagesOptionsCallback(): array
     {
@@ -296,7 +257,7 @@ class DataContainerListener
             $this->logger->log(
                 LogLevel::ERROR,
                 sprintf('Field "%s" does not exist in DCA "%s"', $field, $dc->table),
-                ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]
+                ['contao' => new ContaoContext(__METHOD__, TL_ERROR)],
             );
 
             throw new BadRequestHttpException('Bad request');
@@ -314,7 +275,7 @@ class DataContainerListener
                 $this->logger->log(
                     LogLevel::ERROR,
                     sprintf('A record with the ID "%s" does not exist in table "%s"', $id, $dc->table),
-                    ['contao' => new ContaoContext(__METHOD__, TL_ERROR)]
+                    ['contao' => new ContaoContext(__METHOD__, TL_ERROR)],
                 );
 
                 throw new BadRequestHttpException('Bad request');
@@ -400,7 +361,7 @@ class DataContainerListener
         if (\is_array($session['CURRENT']['IDS'] ?? null)) {
             $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
                 $session['CURRENT']['IDS'],
-                'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT
+                'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT,
             );
 
             $this->requestStack->getSession()->replace($session);
@@ -437,7 +398,7 @@ class DataContainerListener
                                 $this->permissionChecker->addNodeToAllowedRoots($nodeId);
                             }
                         }
-                    // no break;
+                        // no break;
 
                     case 'copy':
                     case 'delete':

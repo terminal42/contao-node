@@ -1,12 +1,6 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Name', 'Please enter the internal node name.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Type', 'Here you can choose the node type.'];
@@ -35,8 +29,8 @@ $GLOBALS['TL_LANG']['tl_node']['protected_legend'] = 'Access protection';
  * Reference
  */
 $GLOBALS['TL_LANG']['tl_node']['typeRef'] = [
-    \Terminal42\NodeBundle\Model\NodeModel::TYPE_CONTENT => 'Content',
-    \Terminal42\NodeBundle\Model\NodeModel::TYPE_FOLDER => 'Folder',
+    NodeModel::TYPE_CONTENT => 'Content',
+    NodeModel::TYPE_FOLDER => 'Folder',
 ];
 
 /*

@@ -1,12 +1,6 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Název', 'Zadejte prosím vlastní název tohoto prvku.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Typ', 'Zde můžete vybrat jeden z dostupných typů.'];
@@ -25,8 +19,8 @@ $GLOBALS['TL_LANG']['tl_node']['filter_legend'] = 'Nastavení filtru';
  * Reference
  */
 $GLOBALS['TL_LANG']['tl_node']['typeRef'] = [
-    \Terminal42\NodeBundle\Model\NodeModel::TYPE_CONTENT => 'Obsah',
-    \Terminal42\NodeBundle\Model\NodeModel::TYPE_FOLDER => 'Složka',
+    NodeModel::TYPE_CONTENT => 'Obsah',
+    NodeModel::TYPE_FOLDER => 'Složka',
 ];
 
 /*

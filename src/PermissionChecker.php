@@ -2,39 +2,25 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle;
 
 use Contao\BackendUser;
 use Contao\Database;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Security;
 
 class PermissionChecker
 {
-    const PERMISSION_CREATE = 'create';
-    const PERMISSION_EDIT = 'edit';
-    const PERMISSION_CONTENT = 'content';
-    const PERMISSION_DELETE = 'delete';
-    const PERMISSION_ROOT = 'root';
+    public const PERMISSION_CREATE = 'create';
 
-    /**
-     * @var Connection
-     */
-    private $db;
+    public const PERMISSION_EDIT = 'edit';
 
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
+    public const PERMISSION_CONTENT = 'content';
+
+    public const PERMISSION_DELETE = 'delete';
+
+    public const PERMISSION_ROOT = 'root';
 
     /**
      * @var BackendUser
@@ -44,10 +30,10 @@ class PermissionChecker
     /**
      * PermissionChecker constructor.
      */
-    public function __construct(Connection $db, TokenStorageInterface $tokenStorage)
-    {
-        $this->db = $db;
-        $this->tokenStorage = $tokenStorage;
+    public function __construct(
+        private Connection $db,
+        private Security $security,
+    ) {
     }
 
     /**
@@ -80,7 +66,7 @@ class PermissionChecker
     /**
      * Get the user allowed roots. Return null if the user has no limitation.
      */
-    public function getUserAllowedRoots(): ?array
+    public function getUserAllowedRoots(): array|null
     {
         if ($this->isUserAdmin()) {
             return null;
@@ -171,27 +157,10 @@ class PermissionChecker
         return array_filter(array_map('intval', $ids), [$this, 'isUserAllowedNode']);
     }
 
-    /**
-     * Get the user.
-     *
-     * @throws \RuntimeException
-     *
-     * @return BackendUser
-     */
-    private function getUser()
+    private function getUser(): BackendUser
     {
         if (null === $this->user) {
-            if (null === $this->tokenStorage) {
-                throw new \RuntimeException('No token storage provided');
-            }
-
-            $token = $this->tokenStorage->getToken();
-
-            if (null === $token) {
-                throw new \RuntimeException('No token provided');
-            }
-
-            $this->user = $token->getUser();
+            $this->user = $this->security->getUser();
 
             if (!$this->user instanceof BackendUser) {
                 throw new \RuntimeException('The token does not contain a back end user object');

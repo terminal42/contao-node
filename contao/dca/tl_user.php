@@ -1,14 +1,8 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Terminal42\NodeBundle\PermissionChecker;
 
 /*
  * Palettes
@@ -37,11 +31,11 @@ $GLOBALS['TL_DCA']['tl_user']['fields']['nodePermissions'] = [
     'exclude' => true,
     'inputType' => 'checkbox',
     'options' => [
-        \Terminal42\NodeBundle\PermissionChecker::PERMISSION_CREATE,
-        \Terminal42\NodeBundle\PermissionChecker::PERMISSION_EDIT,
-        \Terminal42\NodeBundle\PermissionChecker::PERMISSION_DELETE,
-        \Terminal42\NodeBundle\PermissionChecker::PERMISSION_CONTENT,
-        \Terminal42\NodeBundle\PermissionChecker::PERMISSION_ROOT,
+        PermissionChecker::PERMISSION_CREATE,
+        PermissionChecker::PERMISSION_EDIT,
+        PermissionChecker::PERMISSION_DELETE,
+        PermissionChecker::PERMISSION_CONTENT,
+        PermissionChecker::PERMISSION_ROOT,
     ],
     'reference' => &$GLOBALS['TL_LANG']['tl_user']['nodePermissionsRef'],
     'eval' => ['multiple' => true, 'fieldType' => 'checkbox', 'tl_class' => 'clr'],

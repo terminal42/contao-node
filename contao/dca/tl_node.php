@@ -1,18 +1,14 @@
 <?php
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
+use Contao\Controller;
+use Contao\DC_Table;
+use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_DCA']['tl_node'] = [
     // Config
     'config' => [
         'label' => &$GLOBALS['TL_LANG']['MOD']['nodes'][0],
-        'dataContainer' => \Contao\DC_Table::class,
+        'dataContainer' => DC_Table::class,
         'ctable' => ['tl_content'],
         'enableVersioning' => true,
         'markAsCopy' => 'name',
@@ -146,8 +142,8 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'filter' => true,
             'inputType' => 'select',
             'options' => [
-                \Terminal42\NodeBundle\Model\NodeModel::TYPE_CONTENT,
-                \Terminal42\NodeBundle\Model\NodeModel::TYPE_FOLDER,
+                NodeModel::TYPE_CONTENT,
+                NodeModel::TYPE_FOLDER,
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_node']['typeRef'],
             'eval' => ['tl_class' => 'w50'],
@@ -163,9 +159,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
         'nodeTpl' => [
             'exclude' => true,
             'inputType' => 'select',
-            'options_callback' => static function () {
-                return Contao\Controller::getTemplateGroup('node_');
-            },
+            'options_callback' => static fn () => Controller::getTemplateGroup('node_'),
             'eval' => ['includeBlankOption' => true, 'chosen' => true, 'tl_class' => 'w50'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => ''],
         ],
@@ -205,7 +199,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
             'inputType' => 'checkbox',
             'foreignKey' => 'tl_member_group.name',
             'eval' => ['mandatory' => true, 'multiple' => true],
-            'sql' => "blob NULL",
+            'sql' => 'blob NULL',
             'relation' => ['type' => 'hasMany', 'load' => 'lazy'],
         ],
         'guests' => [

@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\Model;
 
 use Contao\ContentModel;
@@ -21,8 +13,9 @@ class NodeModel extends Model
     /**
      * Types.
      */
-    const TYPE_CONTENT = 'content';
-    const TYPE_FOLDER = 'folder';
+    public const TYPE_CONTENT = 'content';
+
+    public const TYPE_FOLDER = 'folder';
 
     /**
      * Table name.
@@ -34,7 +27,7 @@ class NodeModel extends Model
     /**
      * Get the content elements.
      */
-    public function getContentElements(): ?Collection
+    public function getContentElements(): Collection|null
     {
         return ContentModel::findPublishedByPidAndTable($this->id, static::getTable());
     }

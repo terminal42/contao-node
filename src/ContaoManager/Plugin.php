@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Node Bundle for Contao Open Source CMS.
- *
- * @copyright  Copyright (c) 2019, terminal42 gmbh
- * @author     terminal42 <https://terminal42.ch>
- * @license    MIT
- */
-
 namespace Terminal42\NodeBundle\ContaoManager;
 
 use Codefog\HasteBundle\CodefogHasteBundle;
@@ -23,9 +15,6 @@ use Terminal42\NodeBundle\Terminal42NodeBundle;
 
 class Plugin implements BundlePluginInterface, ExtensionPluginInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getBundles(ParserInterface $parser): array
     {
         return [
