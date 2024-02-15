@@ -17,10 +17,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class Terminal42NodeBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container): void
+    public function getPath(): string
     {
+        return \dirname(__DIR__);
     }
 }
