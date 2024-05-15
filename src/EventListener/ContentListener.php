@@ -96,7 +96,7 @@ class ContentListener
             $ids = array_map('intval', $ids);
 
             // Check for potential circular reference
-            if ('tl_node' === $dc->activeRecord->ptable && \in_array((int) $dc->activeRecord->pid, $ids, true)) {
+            if ('tl_node' === ($dc->activeRecord->ptable ?? null) && \in_array((int) $dc->activeRecord->pid, $ids, true)) {
                 throw new \InvalidArgumentException($GLOBALS['TL_LANG']['ERR']['circularReference']);
             }
         }
