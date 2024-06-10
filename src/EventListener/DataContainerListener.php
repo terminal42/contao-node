@@ -179,7 +179,7 @@ class DataContainerListener
 
         // Generate the languages
         foreach (StringUtil::trimsplit(',', $row['languages']) as $language) {
-            $languages[] = $allLanguages[$language];
+            $languages[] = $allLanguages[$language] ?? $language;
         }
 
         $tags = [];
