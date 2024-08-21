@@ -76,7 +76,7 @@ class PermissionChecker
      *
      * @param int|array<int> $nodeId
      */
-    public function isUserAllowedRootNode(int|array $nodeId): bool
+    public function isUserAllowedRootNode(array|int $nodeId): bool
     {
         if (null === ($roots = $this->getUserAllowedRoots())) {
             return true;

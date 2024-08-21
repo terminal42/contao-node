@@ -58,7 +58,7 @@ class DataContainerListener
     /**
      * On paste button callback.
      */
-    public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array|null $clipboard = null): string
+    public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array|false|null $clipboard = null): string
     {
         $disablePA = false;
         $disablePI = false;
@@ -83,14 +83,14 @@ class DataContainerListener
         $return = '';
 
         // Return the buttons
-        $imagePasteAfter = Image::getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
-        $imagePasteInto = Image::getHtml('pasteinto.svg', sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
+        $imagePasteAfter = Image::getHtml('pasteafter.svg', \sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id']));
+        $imagePasteInto = Image::getHtml('pasteinto.svg', \sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id']));
 
         if ($row['id'] > 0) {
-            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
+            $return = $disablePA ? Image::getHtml('pasteafter_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=1&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(\sprintf($GLOBALS['TL_LANG'][$table]['pasteafter'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteAfter.'</a> ';
         }
 
-        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
+        return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(\sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
     /**
@@ -192,14 +192,14 @@ class DataContainerListener
             }
         }
 
-        return sprintf(
+        return \sprintf(
             '%s <a href="%s" title="%s">%s</a>%s%s',
             Image::getHtml($image, '', $imageAttribute),
             Backend::addToUrl('nn='.$row['id']),
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            \count($languages) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
-            \count($tags) > 0 ? sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : '',
+            \count($languages) > 0 ? \sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
+            \count($tags) > 0 ? \sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : '',
         );
     }
 
@@ -250,31 +250,31 @@ class DataContainerListener
         }
 
         $dc->field = $field;
+        $id = (int) $id;
 
         // The field does not exist
         if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$field])) {
             $this->logger->log(
                 LogLevel::ERROR,
-                sprintf('Field "%s" does not exist in DCA "%s"', $field, $dc->table),
-                ['contao' => new ContaoContext(__METHOD__, TL_ERROR)],
+                \sprintf('Field "%s" does not exist in DCA "%s"', $field, $dc->table),
+                ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)],
             );
 
             throw new BadRequestHttpException('Bad request');
         }
 
-        $row = null;
         $value = null;
 
         // Load the value
-        if ('overrideAll' !== Input::get('act') && $id > 0 && $this->db->getSchemaManager()->tablesExist([$dc->table])) {
+        if ('overrideAll' !== Input::get('act') && $id > 0 && $this->db->createSchemaManager()->tablesExist([$dc->table])) {
             $row = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
             // The record does not exist
             if (!$row) {
                 $this->logger->log(
                     LogLevel::ERROR,
-                    sprintf('A record with the ID "%s" does not exist in table "%s"', $id, $dc->table),
-                    ['contao' => new ContaoContext(__METHOD__, TL_ERROR)],
+                    \sprintf('A record with the ID "%s" does not exist in table "%s"', $id, $dc->table),
+                    ['contao' => new ContaoContext(__METHOD__, ContaoContext::ERROR)],
                 );
 
                 throw new BadRequestHttpException('Bad request');
@@ -407,7 +407,7 @@ class DataContainerListener
                         }
 
                         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                            throw new AccessDeniedException(sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
+                            throw new AccessDeniedException(\sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
                         }
                         break;
 

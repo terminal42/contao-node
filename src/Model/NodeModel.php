@@ -26,6 +26,8 @@ class NodeModel extends Model
 
     /**
      * Get the content elements.
+     *
+     * @return Collection<ContentModel>|null
      */
     public function getContentElements(): Collection|null
     {

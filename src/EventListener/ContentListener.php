@@ -90,7 +90,7 @@ class ContentListener
 
             // Do not allow folder nodes
             if (\count($folders) > 0) {
-                throw new \InvalidArgumentException(sprintf($GLOBALS['TL_LANG']['ERR']['invalidNodes'], implode(', ', array_column($folders, 'name'))));
+                throw new \InvalidArgumentException(\sprintf($GLOBALS['TL_LANG']['ERR']['invalidNodes'], implode(', ', array_column($folders, 'name'))));
             }
 
             $ids = array_map('intval', $ids);
@@ -114,7 +114,7 @@ class ContentListener
         }
 
         if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-            throw new AccessDeniedException(sprintf('The user is not allowed to manage the content of node ID %s', $nodeId));
+            throw new AccessDeniedException(\sprintf('The user is not allowed to manage the content of node ID %s', $nodeId));
         }
     }
 }

@@ -1,6 +1,5 @@
 <?php
 
-
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Terminal42\NodeBundle\PermissionChecker;
 

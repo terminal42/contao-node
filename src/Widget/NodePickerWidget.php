@@ -11,6 +11,14 @@ use Contao\Widget;
 use Terminal42\NodeBundle\EventListener\DataContainerListener;
 use Terminal42\NodeBundle\Model\NodeModel;
 
+/**
+ * @property bool   $multiple
+ * @property array  $rootNodes
+ * @property string $fieldType
+ * @property int    $sorting
+ * @property string $strOrderName
+ * @property int    $strOrderId
+ */
 class NodePickerWidget extends Widget
 {
     /**
@@ -111,7 +119,7 @@ class NodePickerWidget extends Widget
 
         if (!$input) {
             if ($this->mandatory) {
-                $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mandatory'], $this->strLabel));
+                $this->addError(\sprintf($GLOBALS['TL_LANG']['ERR']['mandatory'], $this->strLabel));
             }
 
             return '';

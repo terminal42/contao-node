@@ -1,6 +1,5 @@
 <?php
 
-
 use Contao\Controller;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\System;

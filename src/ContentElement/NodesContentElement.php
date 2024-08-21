@@ -49,7 +49,7 @@ class NodesContentElement extends ContentElement
                 $scopeMatcher = System::getContainer()->get('contao.routing.scope_matcher');
 
                 if ($scopeMatcher->isBackendRequest($request)) {
-                    return sprintf('<strong class="tl_red">%s</strong>', $GLOBALS['TL_LANG']['ERR']['circularReference']);
+                    return \sprintf('<strong class="tl_red">%s</strong>', $GLOBALS['TL_LANG']['ERR']['circularReference']);
                 }
             }
 
@@ -98,7 +98,7 @@ class NodesContentElement extends ContentElement
 
             /** @var NodeModel $nodeModel */
             foreach ($nodeModels as $nodeModel) {
-                $nodes[] = sprintf(
+                $nodes[] = \sprintf(
                     '<a href="%s" class="tl_gray" target="_blank">%s (ID: %s)</a>',
                     $router->generate('contao_backend', ['do' => 'nodes', 'table' => 'tl_content', 'id' => $nodeModel->id]),
                     $nodeModel->name,
