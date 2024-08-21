@@ -8,7 +8,6 @@ use Codefog\HasteBundle\Model\DcaRelationsModel;
 use Codefog\TagsBundle\Manager\ManagerInterface;
 use Codefog\TagsBundle\Tag;
 use Contao\Backend;
-use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
@@ -457,7 +456,6 @@ class DataContainerListener
 
         $ids = [];
         $links = [];
-        $user = BackendUser::getInstance();
 
         // Generate breadcrumb trail
         if ($nodeId) {
@@ -487,7 +485,7 @@ class DataContainerListener
                 }
 
                 // Do not show the mounted nodes
-                if (!$user->isAdmin && $user->hasAccess($node['id'], 'nodeMounts')) {
+                if (!$this->permissionChecker->isUserAdmin() && $this->permissionChecker->isUserAllowedRootNode($node['id'])) {
                     break;
                 }
 
@@ -496,7 +494,7 @@ class DataContainerListener
         }
 
         // Check whether the node is mounted
-        if (!$user->hasAccess($ids, 'nodeMounts')) {
+        if (!$this->permissionChecker->isUserAllowedRootNode($ids)) {
             $session->set(self::BREADCRUMB_SESSION_KEY, 0);
 
             throw new AccessDeniedException('Node ID '.$nodeId.' is not mounted.');

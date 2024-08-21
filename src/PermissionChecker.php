@@ -8,7 +8,8 @@ use Contao\BackendUser;
 use Contao\Database;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PermissionChecker
 {
@@ -22,17 +23,10 @@ class PermissionChecker
 
     public const PERMISSION_ROOT = 'root';
 
-    /**
-     * @var BackendUser
-     */
-    private $user;
-
-    /**
-     * PermissionChecker constructor.
-     */
     public function __construct(
         private Connection $db,
-        private Security $security,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private TokenStorageInterface $tokenStorage,
     ) {
     }
 
@@ -41,7 +35,7 @@ class PermissionChecker
      */
     public function isUserAdmin(): bool
     {
-        return (bool) $this->getUser()->isAdmin;
+        return $this->authorizationChecker->isGranted('ROLE_ADMIN');
     }
 
     /**
@@ -49,18 +43,14 @@ class PermissionChecker
      */
     public function hasUserPermission(string $permission): bool
     {
-        if ($this->isUserAdmin()) {
-            return true;
-        }
-
-        $value = $this->getUser()->hasAccess($permission, 'nodePermissions');
+        $isGranted = $this->authorizationChecker->isGranted('contao_user.nodePermissions.'.$permission);
 
         // If the user is able to create records, he is automatically able to edit them
-        if (!$value && self::PERMISSION_EDIT === $permission) {
+        if (!$isGranted && self::PERMISSION_EDIT === $permission) {
             return $this->hasUserPermission(self::PERMISSION_CREATE);
         }
 
-        return $value;
+        return $isGranted;
     }
 
     /**
@@ -79,6 +69,24 @@ class PermissionChecker
         }
 
         return array_map('intval', $ids);
+    }
+
+    /**
+     * Check whether at least one of the given IDs is in the allowed root nodes.
+     *
+     * @param int|array<int> $nodeId
+     */
+    public function isUserAllowedRootNode(int|array $nodeId): bool
+    {
+        if (null === ($roots = $this->getUserAllowedRoots())) {
+            return true;
+        }
+
+        if (!\is_array($nodeId)) {
+            $nodeId = [$nodeId];
+        }
+
+        return (bool) array_intersect($nodeId, $roots);
     }
 
     /**
@@ -159,14 +167,12 @@ class PermissionChecker
 
     private function getUser(): BackendUser
     {
-        if (null === $this->user) {
-            $this->user = $this->security->getUser();
+        $user = $this->tokenStorage->getToken()?->getUser();
 
-            if (!$this->user instanceof BackendUser) {
-                throw new \RuntimeException('The token does not contain a back end user object');
-            }
+        if (!$user instanceof BackendUser) {
+            throw new \RuntimeException('The token does not contain a back end user object');
         }
 
-        return $this->user;
+        return $user;
     }
 }
