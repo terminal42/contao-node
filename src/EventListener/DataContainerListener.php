@@ -281,7 +281,7 @@ class DataContainerListener
             }
 
             $value = $row[$field];
-            $dc->activeRecord = $row;
+            $dc->activeRecord = (object) $row;
         }
 
         // Call the load_callback

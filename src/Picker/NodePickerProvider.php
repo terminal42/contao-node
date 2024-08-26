@@ -47,7 +47,12 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
         return 'nodePicker';
     }
 
-    public function supportsContext(string $context): bool
+    /**
+     * Do not add "string" parameter type for compatibility with Contao 4.13.
+     *
+     * @param string $context
+     */
+    public function supportsContext($context): bool
     {
         return 'node' === $context;
     }
