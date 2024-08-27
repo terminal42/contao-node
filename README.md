@@ -12,14 +12,6 @@ Install the bundle via Composer:
 composer require terminal42/contao-node
 ```
 
-### Still using Haste 4?
-
-If you are still using Haste 4 in your projects, you should require the bundle as follows to get all new bugfixes:
-
-```
-composer require terminal42/contao-node:^1.5.10
-```
-
 ## Configuration
 
 Once installed, you can start creating groups and nodes in the `Content > Nodes` backend module. Roughly said they work

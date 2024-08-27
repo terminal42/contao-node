@@ -21,6 +21,7 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
+use Haste\Model\Model;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -182,7 +183,12 @@ class DataContainerListener
         }
 
         $tags = [];
-        $tagIds = DcaRelationsModel::getRelatedValues('tl_node', 'tags', $row['id']);
+
+        if (class_exists(DcaRelationsModel::class)) {
+            $tagIds = DcaRelationsModel::getRelatedValues('tl_node', 'tags', $row['id']);
+        } else {
+            $tagIds = Model::getRelatedValues('tl_node', 'tags', $row['id']);
+        }
 
         // Generate the tags
         if (\count($tagIds) > 0) {
