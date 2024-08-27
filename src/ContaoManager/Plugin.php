@@ -10,6 +10,7 @@ use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Config\ContainerBuilder;
 use Contao\ManagerPlugin\Config\ExtensionPluginInterface;
+use Terminal42\Geoip2CountryBundle\Terminal42Geoip2CountryBundle;
 use Terminal42\NodeBundle\Terminal42NodeBundle;
 
 class Plugin implements BundlePluginInterface, ExtensionPluginInterface
@@ -17,7 +18,8 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
     public function getBundles(ParserInterface $parser): array
     {
         return [
-            BundleConfig::create(Terminal42NodeBundle::class)->setLoadAfter([ContaoCoreBundle::class, 'haste']),
+            BundleConfig::create(Terminal42NodeBundle::class)
+                ->setLoadAfter([ContaoCoreBundle::class, 'haste', Terminal42Geoip2CountryBundle::class]),
         ];
     }
 

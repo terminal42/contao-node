@@ -38,7 +38,7 @@
         "symfony/security-core": "^5.0 || ^6.0 || ^7.0"
     },
     "require-dev": {
-        "terminal42/contao-geoip2-country": "^1.0",
+        "terminal42/contao-geoip2-country": "^1.4",
         "contao/manager-plugin": "^2.0",
         "terminal42/contao-build-tools": "dev-main"
     },
@@ -47,7 +47,7 @@
     },
     "conflict": {
         "contao/manager-plugin": "<2.0 || >=3.0",
-        "terminal42/contao-geoip2-country": ">= 2.0"
+        "terminal42/contao-geoip2-country": "< 1.4 || >= 2.0"
     },
     "autoload": {
         "psr-4": {
