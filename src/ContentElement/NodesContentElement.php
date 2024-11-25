@@ -107,7 +107,7 @@ class NodesContentElement extends ContentElement
             }
         }
 
-        $wildcard = '### '.mb_strtoupper($GLOBALS['TL_LANG']['FMD'][$data['type']][0]).' ###';
+        $wildcard = '### '.strtoupper($GLOBALS['TL_LANG']['FMD'][$data['type']][0]).' ###';
 
         // Add nodes
         if (\count($nodes) > 0) {
