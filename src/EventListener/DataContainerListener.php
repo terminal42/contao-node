@@ -508,7 +508,7 @@ class DataContainerListener
 
         // Limit tree
         $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = [$nodeId];
-        $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['showRootTrails'] = true;
+        $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['visibleRoot'] = $nodeId;
 
         // Add root link
         $links[] = Image::getHtml($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['icon']).' <a href="'.Backend::addToUrl('nn=0').'" title="'.StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectAllNodes']).'">'.$GLOBALS['TL_LANG']['MSC']['filterAll'].'</a>';
