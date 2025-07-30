@@ -1,6 +1,7 @@
 <?php
 
 use Contao\Controller;
+use Contao\DataContainer;
 use Contao\DC_Table;
 use Terminal42\NodeBundle\Model\NodeModel;
 
@@ -26,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_node'] = [
     // List
     'list' => [
         'sorting' => [
-            'mode' => 5,
+            'mode' => DataContainer::MODE_TREE,
             'icon' => 'folderC.svg',
             'rootPaste' => true,
             'paste_button_callback' => ['terminal42_node.listener.data_container', 'onPasteButtonCallback'],
