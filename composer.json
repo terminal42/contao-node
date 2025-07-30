@@ -29,7 +29,7 @@
         "contao/core-bundle": "^4.13 || ^5.0",
         "codefog/contao-haste": "^4.21 || ^5.0",
         "codefog/tags-bundle": "^3.3",
-        "doctrine/dbal": "^3.3",
+        "doctrine/dbal": "^3.3 || ^4.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "symfony/config": "^5.0 || ^6.0 || ^7.0",
         "symfony/dependency-injection": "^5.0 || ^6.0 || ^7.0",
