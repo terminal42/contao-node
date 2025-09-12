@@ -1,0 +1,9 @@
+{% set attributes = attrs()
+    .setIfExists('id', cssID)
+    .addClass(['node_wrapper', class])
+    .mergeWith(attributes|default)
+%}
+
+<div{{ attributes }}>
+    {{ buffer|raw }}
+</div>

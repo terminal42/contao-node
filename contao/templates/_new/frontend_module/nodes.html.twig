@@ -1,0 +1,21 @@
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block wrapper %}
+    {% if nodesWrapper ?? false %}
+        {% set attributes = attrs()
+            .setIfExists('id', element_html_id)
+            .addClass([element_css_classes, class, "module-#{type|replace({'_': '-'})}"])
+            .mergeWith(attributes|default)
+        %}
+
+        <{% block wrapper_tag %}div{% endblock %}{% block attributes %}{{ attributes }}{% endblock %}>
+    {% endif %}
+
+    {% for node in nodes %}
+        {{ nodes|raw }}
+    {% endfor %}
+
+    {% if nodesWrapper ?? false %}
+        </{{ block('wrapper_tag') }}>
+    {% endif %}
+{% endblock %}

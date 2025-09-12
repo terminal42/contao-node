@@ -1,0 +1,15 @@
+<div class="tl_gray">
+    <span class="upper">### {{ label }} ###</span>
+    {% if nodes %}
+        <br>
+        {% for node in nodes %}
+            {% set node_href = path('contao_backend', {do: 'nodes', table: 'tl_content', id: node.id}) %}
+            <a href="{{ node_href }}" class="tl_gray" target="_blank">{{ node.name}} (ID: {{ node.id }})</a><br>
+        {% endfor %}
+    {% endif %}
+    {% if hrefParams %}
+        <br>
+        {% set href = path('contao_backend', hrefParams) %}
+        {{ name }} (<a href="{{ href }}" class="tl_gray">ID: {{ id }}</a>)
+    {% endif %}
+</div>

@@ -12,9 +12,6 @@ use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodeManager
 {
-    /**
-     * Generate single node.
-     */
     public function generateSingle(int $id): string|null
     {
         if (!$id) {
@@ -28,9 +25,6 @@ class NodeManager
         return $this->generateBuffer($nodeModel);
     }
 
-    /**
-     * Generate multiple nodes.
-     */
     public function generateMultiple(array $ids): array
     {
         $ids = array_filter($ids);
@@ -61,9 +55,6 @@ class NodeManager
         return array_filter($nodes, static fn ($buffer) => null !== $buffer);
     }
 
-    /**
-     * Generate the node buffer (content elements).
-     */
     private function generateBuffer(NodeModel $nodeModel): string
     {
         if (!Controller::isVisibleElement($nodeModel)) {

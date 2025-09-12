@@ -1,3 +1,0 @@
-<div<?php if ($this->cssID): ?> id="<?= $this->cssID; ?>"<?php endif; ?> class="node_wrapper <?= $this->class; ?>">
-    <?= $this->buffer; ?>
-</div>

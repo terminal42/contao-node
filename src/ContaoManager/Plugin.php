@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Terminal42\NodeBundle\ContaoManager;
 
+use Codefog\HasteBundle\CodefogHasteBundle;
 use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
@@ -19,7 +20,7 @@ class Plugin implements BundlePluginInterface, ExtensionPluginInterface
     {
         return [
             BundleConfig::create(Terminal42NodeBundle::class)
-                ->setLoadAfter([ContaoCoreBundle::class, 'haste', Terminal42Geoip2CountryBundle::class]),
+                ->setLoadAfter([ContaoCoreBundle::class, CodefogHasteBundle::class, Terminal42Geoip2CountryBundle::class]),
         ];
     }
 
