@@ -7,7 +7,7 @@
             <a href="{{ node_href }}" class="tl_gray" target="_blank">{{ node.name}} (ID: {{ node.id }})</a><br>
         {% endfor %}
     {% endif %}
-    {% if hrefParams %}
+    {% if hrefParams ?? false %}
         <br>
         {% set href = path('contao_backend', hrefParams) %}
         {{ name }} (<a href="{{ href }}" class="tl_gray">ID: {{ id }}</a>)

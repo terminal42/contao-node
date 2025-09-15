@@ -41,6 +41,7 @@ trait NodesTrait
         }
 
         $template->set('nodes', $nodes);
+        $template->set('nodes_wrapper', (bool) $model->nodesWrapper);
 
         return $template->getResponse();
     }

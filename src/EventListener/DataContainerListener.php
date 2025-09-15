@@ -17,6 +17,7 @@ use Contao\CoreBundle\Intl\Locales;
 use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\CoreBundle\Security\DataContainer\ReadAction;
+use Contao\CoreBundle\Twig\Finder\FinderFactory;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\Image;
@@ -33,6 +34,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NodeBundle\Model\NodeModel;
 use Terminal42\NodeBundle\Security\NodePermissions;
 use Terminal42\NodeBundle\Widget\NodePickerWidget;
@@ -43,10 +45,12 @@ class DataContainerListener
 
     public function __construct(
         private readonly Connection $connection,
+        private readonly FinderFactory $finderFactory,
         private readonly Locales $locales,
         private readonly LoggerInterface $logger,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
+        private readonly TranslatorInterface $translator,
 
         #[Autowire(service: 'codefog_tags.manager.terminal42_node')]
         private readonly ManagerInterface $tagsManager,
@@ -97,8 +101,8 @@ class DataContainerListener
         return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(\sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
-    #[AsCallback('tl_node', 'list.operations.edit.button')]
-    public function onEditButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    #[AsCallback('tl_node', 'list.operations.children.button')]
+    public function onChildrenButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
         return $this->generateButton($row, $href, $label, $title, $icon, $attributes, NodeModel::TYPE_FOLDER !== $row['type']);
     }
@@ -120,7 +124,6 @@ class DataContainerListener
     //
     //    return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
     //}
-
 
     #[AsCallback('tl_node', 'list.label.label')]
     public function onLabelCallback(array $row, string $label, DataContainer|null $dc = null, string $imageAttribute = '', bool $returnImage = false): string
@@ -168,10 +171,29 @@ class DataContainerListener
         return $this->locales->getLocales(null, true);
     }
 
+    #[AsCallback('tl_node', 'fields.groups.options')]
+    public function onGroupsOptionsCallback(): array
+    {
+        $options = [-1 => $this->translator->trans('MSC.guests', [], 'contao_default')];
+        $groups = $this->connection->fetchAllAssociative('SELECT id, name FROM tl_member_group WHERE tstamp>0 ORDER BY name');
+
+        foreach ($groups as $group) {
+            $options[$group['id']] = $group['name'];
+        }
+
+        return $options;
+    }
+
     #[AsCallback('tl_node', 'fields.nodeTpl.options')]
     public function onNodeTplOptionsCallback(): array
     {
-        return Controller::getTemplateGroup('node_');
+        return $this->finderFactory
+            ->create()
+            ->identifier('node')
+            ->extension('html.twig')
+            ->withVariants()
+            ->asTemplateOptions()
+        ;
     }
 
     #[AsHook('executePostActions')]

@@ -122,15 +122,9 @@ $GLOBALS['TL_DCA']['tl_node'] = [
         ],
         'groups' => [
             'inputType' => 'checkbox',
-            'foreignKey' => 'tl_member_group.name',
             'eval' => ['mandatory' => true, 'multiple' => true],
             'sql' => ['type' => Types::BLOB, 'notnull' => false],
             'relation' => ['type' => 'hasMany', 'load' => 'lazy'],
-        ],
-        'guests' => [
-            'inputType' => 'checkbox',
-            'eval' => ['tl_class' => 'clr'],
-            'sql' => ['type' => Types::BOOLEAN, 'default' => false],
         ],
     ],
 ];

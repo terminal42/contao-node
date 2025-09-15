@@ -77,7 +77,7 @@ class NodeManager
             return $buffer;
         }
 
-        $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
+        $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node/default');
         $template->setData($nodeModel->row());
         $template->elementsData = $elementsData;
 

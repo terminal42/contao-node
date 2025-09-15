@@ -13,7 +13,6 @@ $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Parent node'];
 $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
 $GLOBALS['TL_LANG']['tl_node']['protected'] = ['Protect node', 'Show the node to certain member groups only'];
 $GLOBALS['TL_LANG']['tl_node']['groups'] = ['Allowed member groups', 'These groups will be able to see the node'];
-$GLOBALS['TL_LANG']['tl_node']['guests'] = ['Show to guests only', 'Hide the node if a member is logged in.'];
 $GLOBALS['TL_LANG']['tl_node']['geoip_visibility'] = ['IP Geolocation', 'Show or hide this node for visitors from certain countries.'];
 $GLOBALS['TL_LANG']['tl_node']['geoip_countries'] = ['Countries', 'Select one or multiple countries to allow/deny seeing this node.'];
 
