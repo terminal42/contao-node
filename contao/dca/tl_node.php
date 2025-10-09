@@ -45,8 +45,10 @@ $GLOBALS['TL_DCA']['tl_node'] = [
 
     // Palettes
     'palettes' => [
-        '__selector__' => ['wrapper', 'protected'],
+        '__selector__' => ['type', 'wrapper', 'protected'],
         'default' => '{name_legend},name,type;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:hide},protected,guests',
+        NodeModel::TYPE_FOLDER => '{name_legend},name,type;{filter_legend},languages,tags',
+        NodeModel::TYPE_CONTENT => '{name_legend},name,type,alias;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:hide},protected,guests',
     ],
 
     // Subpalettes
@@ -86,8 +88,14 @@ $GLOBALS['TL_DCA']['tl_node'] = [
                 NodeModel::TYPE_FOLDER,
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_node']['typeRef'],
-            'eval' => ['tl_class' => 'w50'],
+            'eval' => ['submitOnChange' => true, 'tl_class' => 'w50'],
             'sql' => ['type' => Types::STRING, 'length' => 7, 'default' => ''],
+        ],
+        'alias' => [
+            'search' => true,
+            'inputType' => 'text',
+            'eval' => ['rgxp' => 'alias', 'doNotCopy' => true, 'unique' => true, 'maxlength' => 255, 'tl_class' => 'w50'],
+            'sql' => ['type' => Types::STRING, 'length' => 255, 'default' => ''],
         ],
         'wrapper' => [
             'inputType' => 'checkbox',

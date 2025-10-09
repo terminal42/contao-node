@@ -154,14 +154,31 @@ class DataContainerListener
             }
         }
 
+        $extras = [];
+
+        if ($languages !== []) {
+            $extras[] = implode(', ', $languages);
+        }
+
+        if ($tags !== []) {
+            $extras[] = implode(', ', $tags);
+        }
+
+        if ($row['type'] === NodeModel::TYPE_CONTENT) {
+            $extras[] = sprintf('ID: %d', $row['id']);
+
+            if ($row['alias']) {
+                $extras[] = sprintf('%s: %s', $GLOBALS['TL_LANG']['tl_node']['alias'][0], $row['alias']);
+            }
+        }
+
         return \sprintf(
-            '%s <a href="%s" title="%s">%s</a>%s%s',
+            '%s <a href="%s" title="%s">%s</a>%s',
             Image::getHtml($image, '', $imageAttribute),
             Backend::addToUrl('nn='.$row['id']),
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            \count($languages) > 0 ? \sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
-            \count($tags) > 0 ? \sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : '',
+            $extras ? ' '.implode('', array_map(static fn (string $v) => sprintf('<span class="tl_gray" style="margin-left:3px;">[%s]</span>', $v), $extras)) : '',
         );
     }
 

@@ -8,32 +8,61 @@ use Contao\ContentModel;
 use Contao\Controller;
 use Contao\FrontendTemplate;
 use Contao\StringUtil;
+use Doctrine\DBAL\Connection;
 use Terminal42\NodeBundle\Model\NodeModel;
 
 class NodeManager
 {
-    public function generateSingle(int $id): string|null
+    public function __construct(private readonly Connection $connection)
     {
-        if (!$id) {
+    }
+
+    public function generateSingle(int|string $idOrAlias): string|null
+    {
+        if (!$idOrAlias) {
             return null;
         }
 
-        if (null === ($nodeModel = NodeModel::findOneBy(['id=?', 'type=?'], [$id, NodeModel::TYPE_CONTENT]))) {
+        if (null === ($nodeModel = NodeModel::findOneBy(['(id=? OR alias=?)', 'type=?'], [$idOrAlias, $idOrAlias, NodeModel::TYPE_CONTENT]))) {
             return null;
         }
 
         return $this->generateBuffer($nodeModel);
     }
 
-    public function generateMultiple(array $ids): array
+    public function generateMultiple(array $idsOrAliases): array
     {
-        $ids = array_filter($ids);
+        $idsOrAliases = array_filter($idsOrAliases);
 
-        if (0 === \count($ids)) {
+        if (0 === \count($idsOrAliases)) {
             return [];
         }
 
-        $ids = array_map('intval', $ids);
+        $isAlias = static fn ($v) => is_string($v) && !is_numeric($v);
+        $aliases = array_filter($idsOrAliases, $isAlias);
+
+        // If there are aliases, fetch their IDs and put them in respective places
+        if ($aliases !== []) {
+            $aliasesWithIds = $this->connection->fetchAllKeyValue("SELECT alias, id FROM tl_node WHERE id IN ('" . \implode("','", $aliases) . "') ORDER BY FIND_IN_SET(`alias`, '" . implode(',', $aliases) . "')");
+
+            foreach ($idsOrAliases as $k => $v) {
+                if (!$isAlias($v)) {
+                    continue;
+                }
+
+                // Replace the alias with ID
+                if (array_key_exists($v, $aliasesWithIds)) {
+                    $idsOrAliases[$k] = $aliasesWithIds[$v];
+                } else {
+                    // Remove it completely, so it doesn't produce unexpected results later on with intval()
+                    unset($idsOrAliases[$k]);
+                }
+            }
+
+            $idsOrAliases = array_values($idsOrAliases);
+        }
+
+        $ids = array_map(intval(...), $idsOrAliases);
 
         $nodeModels = NodeModel::findBy(
             ['id IN ('.implode(',', $ids).')', 'type=?'],

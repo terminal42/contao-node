@@ -4,6 +4,7 @@ use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Name', 'Please enter the internal node name.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Type', 'Here you can choose the node type.'];
+$GLOBALS['TL_LANG']['tl_node']['alias'] = ['Node alias', 'Here you can enter the node alias, which can be used to reference node via insert tag.'];
 $GLOBALS['TL_LANG']['tl_node']['wrapper'] = ['Add wrapper element', 'Here you can define if this node should have a wrapper.'];
 $GLOBALS['TL_LANG']['tl_node']['cssID'] = ['CSS ID/class', 'Here you can set an ID and one or more classes.'];
 $GLOBALS['TL_LANG']['tl_node']['nodeTpl'] = ['Node template', 'Here you can select a node template.'];

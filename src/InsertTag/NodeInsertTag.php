@@ -36,7 +36,7 @@ class NodeInsertTag implements InsertTagResolverNestedResolvedInterface
         }
 
         if (1 === $total) {
-            $buffer = $this->manager->generateSingle((int) $ids[0]);
+            $buffer = $this->manager->generateSingle($ids[0]);
 
             if (null === $buffer) {
                 $this->logError($insertTag, $ids);
