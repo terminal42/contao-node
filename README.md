@@ -40,4 +40,4 @@ codefog_tags:
 
 ## Insert Tags
 
-The extension also provides two new insert tags: `{{insert_node::*}}` and `{{insert_nodes::*}}`. The former expects the ID of a node and will then generate the output of that node. The latter expects a comma separated list of node IDs and will then generate the output of all those nodes. Example: `{{insert_nodes::1,2,3}}`
+The extension also provides two new insert tags: `{{insert_node::*}}` and `{{insert_nodes::*}}`. The former expects the ID of a node and will then generate the output of that node. The latter expects a comma separated list of node IDs or aliases and will then generate the output of all those nodes. Example: `{{insert_nodes::1,2,3}}`
