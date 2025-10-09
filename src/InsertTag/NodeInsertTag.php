@@ -13,7 +13,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Terminal42\NodeBundle\NodeManager;
 
-#[AsInsertTag('news_title')]
+#[AsInsertTag('insert_node')]
+#[AsInsertTag('insert_nodes')]
 class NodeInsertTag implements InsertTagResolverNestedResolvedInterface
 {
     public function __construct(
