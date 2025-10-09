@@ -36,6 +36,6 @@ class NodeContentVoter extends AbstractDynamicPtableVoter
             return false;
         }
 
-        return $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_EDIT_NODE], $id);
+        return $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_ACCESS_NODE], $id);
     }
 }

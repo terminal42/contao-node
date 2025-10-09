@@ -8,6 +8,7 @@ use Codefog\HasteBundle\Model\DcaRelationsModel;
 use Codefog\TagsBundle\Manager\ManagerInterface;
 use Codefog\TagsBundle\Tag;
 use Contao\Backend;
+use Contao\BackendUser;
 use Contao\Controller;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
 use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
@@ -61,8 +62,7 @@ class DataContainerListener
     public function onLoadCallback(DataContainer $dc): void
     {
         $this->addBreadcrumb($dc);
-        // TODO: needed?
-        //$this->checkPermissions($dc);
+        $this->checkPermissions();
         $this->toggleSwitchToEditFlag($dc);
     }
 
@@ -106,24 +106,6 @@ class DataContainerListener
     {
         return $this->generateButton($row, $href, $label, $title, $icon, $attributes, NodeModel::TYPE_FOLDER !== $row['type']);
     }
-
-    // TODO: needed?
-    //#[AsCallback('tl_node', 'list.operations.copyChilds.button')]
-    //public function onCopyChildsButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
-    //{
-    //    if ($GLOBALS['TL_DCA'][$table]['config']['closed'] ?? null) {
-    //        return '';
-    //    }
-    //
-    //    $active = (NodeModel::TYPE_FOLDER === $row['type']) && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE);
-    //
-    //    // Make the button active only if there are subnodes
-    //    if ($active) {
-    //        $active = $this->connection->fetchOne("SELECT COUNT(*) FROM $table WHERE pid=?", [$row['id']]) > 0;
-    //    }
-    //
-    //    return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
-    //}
 
     #[AsCallback('tl_node', 'list.label.label')]
     public function onLabelCallback(array $row, string $label, DataContainer|null $dc = null, string $imageAttribute = '', bool $returnImage = false): string
@@ -331,98 +313,27 @@ class DataContainerListener
         }
     }
 
-    // TODO: needed?
-    //private function checkPermissions(DataContainer $dc): void
-    //{
-    //    if ($this->permissionChecker->isUserAdmin()) {
-    //        return;
-    //    }
-    //
-    //    // Close the table if user is not allowed to create new records
-    //    if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE)) {
-    //        $GLOBALS['TL_DCA'][$dc->table]['config']['closed'] = true;
-    //        $GLOBALS['TL_DCA'][$dc->table]['config']['notCopyable'] = true;
-    //    }
-    //
-    //    // Set the flag if user is not allowed to edit records
-    //    if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_EDIT)) {
-    //        $GLOBALS['TL_DCA'][$dc->table]['config']['notEditable'] = true;
-    //    }
-    //
-    //    // Set the flag if user is not allowed to delete records
-    //    if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE)) {
-    //        $GLOBALS['TL_DCA'][$dc->table]['config']['notDeletable'] = true;
-    //    }
-    //
-    //    $session = $this->requestStack->getSession()->all();
-    //
-    //    // Filter allowed page IDs
-    //    if (\is_array($session['CURRENT']['IDS'] ?? null)) {
-    //        $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
-    //            $session['CURRENT']['IDS'],
-    //            'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT,
-    //        );
-    //
-    //        $this->requestStack->getSession()->replace($session);
-    //    }
-    //
-    //    // Limit the allowed roots for the user
-    //    if (null !== ($roots = $this->permissionChecker->getUserAllowedRoots())) {
-    //        if (!empty($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && \is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
-    //            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
-    //        } else {
-    //            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;
-    //        }
-    //
-    //        // Allow root paste if the user has enough permission
-    //        if ($this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT)) {
-    //            $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['rootPaste'] = true;
-    //        }
-    //
-    //        // Check current action
-    //        if (($action = Input::get('act')) && 'paste' !== $action) {
-    //            switch ($action) {
-    //                case 'edit':
-    //                    $nodeId = (int) Input::get('id');
-    //
-    //                    // Dynamically add the record to the user profile
-    //                    if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-    //                        /** @var AttributeBagInterface $sessionBag */
-    //                        $sessionBag = $this->requestStack->getSession()->getbag('contao_backend');
-    //
-    //                        $newRecords = $sessionBag->get('new_records');
-    //                        $newRecords = \is_array($newRecords[$dc->table]) ? array_map('intval', $newRecords[$dc->table]) : [];
-    //
-    //                        if (\in_array($nodeId, $newRecords, true)) {
-    //                            $this->permissionChecker->addNodeToAllowedRoots($nodeId);
-    //                        }
-    //                    }
-    //                    // no break;
-    //
-    //                case 'copy':
-    //                case 'delete':
-    //                case 'show':
-    //                    if (!isset($nodeId)) {
-    //                        $nodeId = (int) Input::get('id');
-    //                    }
-    //
-    //                    if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-    //                        throw new AccessDeniedException(\sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
-    //                    }
-    //                    break;
-    //
-    //                case 'editAll':
-    //                case 'deleteAll':
-    //                case 'overrideAll':
-    //                    if (\is_array($session['CURRENT']['IDS'])) {
-    //                        $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $roots);
-    //                        $this->requestStack->getSession()->replace($session);
-    //                    }
-    //                    break;
-    //            }
-    //        }
-    //    }
-    //}
+    private function checkPermissions(): void
+    {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof BackendUser) {
+            return;
+        }
+
+        if ($user->isAdmin) {
+            return;
+        }
+
+        // Set root IDs
+        if (empty($user->nodeMounts) || !is_array($user->nodeMounts)) {
+            $root = [0];
+        } else {
+            $root = $user->nodeMounts;
+        }
+
+        $GLOBALS['TL_DCA']['tl_node']['list']['sorting']['root'] = $root;
+    }
 
     /**
      * Add a breadcrumb menu.
