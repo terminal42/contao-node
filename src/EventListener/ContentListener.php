@@ -64,8 +64,8 @@ class ContentListener
 
         $type = $this->connection->fetchOne('SELECT type FROM tl_node WHERE id=?', [$nodeId]);
 
-        // Throw an exception if the node is not present or is of a folder type
-        if (!$type || NodeModel::TYPE_FOLDER === $type) {
+        // Throw an exception if the node is of a folder type
+        if (NodeModel::TYPE_FOLDER === $type) {
             throw new AccessDeniedException('Node of folder type cannot have content elements');
         }
     }
