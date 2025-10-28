@@ -4,7 +4,7 @@ use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Name', 'Bitte einen internen Namen des Nodes vergeben.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Typ', 'Hier können Sie den Typ des Nodes auswählen.'];
-$GLOBALS['TL_LANG']['tl_node']['alias'] = ['Knoten-Alias', 'Hier können Sie den Knoten-Alias eingeben, der zur Referenzierung des Knotens über ein Insert-Tag verwendet werden kann.'];
+$GLOBALS['TL_LANG']['tl_node']['alias'] = ['Node-Alias', 'Hier können Sie das Node-Alias eingeben, welches zur Referenzierung des Knotens über ein Insert-Tag verwendet werden kann.'];
 $GLOBALS['TL_LANG']['tl_node']['wrapper'] = ['Wrapper hinzufügen', 'Hier können Sie einen Wrapper um diesen Node ausgeben.'];
 $GLOBALS['TL_LANG']['tl_node']['cssID'] = ['CSS-ID/Klasse', 'Hier können Sie eine ID und beliebig viele Klassen eingeben.'];
 $GLOBALS['TL_LANG']['tl_node']['nodeTpl'] = ['Node-Template', 'Hier können Sie ein Node-Template auswählen.'];
