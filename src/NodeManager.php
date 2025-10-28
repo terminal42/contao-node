@@ -90,31 +90,30 @@ class NodeManager
             return '';
         }
 
-        $buffer = '';
-        $elementsData = [];
+        $nodeElements = [];
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
             foreach ($elements as $index => $element) {
-                $elementsData[] = $element->row();
+                // Keep the index if somebody wants to refer that inside the generated content element
                 $element->nodeElementIndex = $index;
-                $buffer .= Controller::getContentElement($element);
+
+                $nodeElements[] = new NodeElement($element->row(), Controller::getContentElement($element));
             }
         }
 
         if (!$nodeModel->wrapper) {
-            return $buffer;
+            return implode('', array_map(static fn (NodeElement $v) => $v->getRenderedHtml(),$nodeElements));
         }
 
         $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node/default');
         $template->setData($nodeModel->row());
-        $template->elementsData = $elementsData;
+        $template->elements = $nodeElements;
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
         $template->class = !empty($cssID[1]) ? $cssID[1] : '';
         $template->cssID = !empty($cssID[0]) ? $cssID[0] : '';
-        $template->buffer = $buffer;
 
         return $template->parse();
     }

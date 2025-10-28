@@ -5,5 +5,7 @@
 %}
 
 <div{{ attributes }}>
-    {{ buffer|raw }}
+    {% for element in elements %}
+        {{ element.renderedHtml|raw }}
+    {% endfor %}
 </div>

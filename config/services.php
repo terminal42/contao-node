@@ -21,6 +21,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->exclude(__DIR__ . '/../src/DependencyInjection')
         ->exclude(__DIR__ . '/../src/Model')
         ->exclude(__DIR__ . '/../src/Widget')
+        ->exclude(__DIR__ . '/../src/NodeElement.php')
         ->exclude(__DIR__ . '/../src/Terminal42NodeBundle.php')
     ;
 
