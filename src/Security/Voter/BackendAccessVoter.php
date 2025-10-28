@@ -14,6 +14,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Terminal42\NodeBundle\Security\NodePermissions;
 
+/**
+ * Decorates the Contao Core BackendAccessVoter in order to support our own NodePermissions::USER_CAN_ACCESS_NODE
+ * which works exactly like the core pagemounts or filemounts. We're using decoration so all the other NodePermissions
+ * can work just the same as they do in core. Decoration is only needed for the "tree-like" permissions.
+ */
 class BackendAccessVoter implements ResetInterface, VoterInterface, CacheableVoterInterface
 {
     private array $nodeMountsCache = [];
