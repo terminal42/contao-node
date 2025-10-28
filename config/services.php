@@ -20,7 +20,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set(NodeManager::class)
-        ->arg('$connection', service('database_connection'))
         ->arg('$twig', service('twig'))
     ;
 

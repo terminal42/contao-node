@@ -7,16 +7,13 @@ namespace Terminal42\NodeBundle;
 use Contao\ContentModel;
 use Contao\Controller;
 use Contao\StringUtil;
-use Doctrine\DBAL\Connection;
 use Terminal42\NodeBundle\Model\NodeModel;
 use Twig\Environment;
 
 class NodeManager
 {
-    public function __construct(
-        private readonly Connection $connection,
-        private readonly Environment $twig,
-    ) {
+    public function __construct(private readonly Environment $twig)
+    {
     }
 
     public function generateSingle(int|string $idOrAlias): string|null
@@ -34,56 +31,50 @@ class NodeManager
 
     public function generateMultiple(array $idsOrAliases): array
     {
-        $idsOrAliases = array_filter($idsOrAliases);
+        $idsOrAliases = array_values(array_filter($idsOrAliases));
 
-        if (0 === \count($idsOrAliases)) {
+        if ([] === $idsOrAliases) {
             return [];
         }
 
-        $isAlias = static fn ($v) => \is_string($v) && !is_numeric($v);
-        $aliases = array_filter($idsOrAliases, $isAlias);
+        $aliases = array_values(array_filter($idsOrAliases, static fn ($v) => \is_string($v) && !is_numeric($v)));
+        $ids = array_map(intval(...), array_values(array_diff($idsOrAliases, $aliases)));
 
-        // If there are aliases, fetch their IDs and put them in respective places
-        if ([] !== $aliases) {
-            $aliasesWithIds = $this->connection->fetchAllKeyValue("SELECT alias, id FROM tl_node WHERE id IN ('".implode("','", $aliases)."') ORDER BY FIND_IN_SET(`alias`, '".implode(',', $aliases)."')");
-
-            foreach ($idsOrAliases as $k => $v) {
-                if (!$isAlias($v)) {
-                    continue;
-                }
-
-                // Replace the alias with ID
-                if (\array_key_exists($v, $aliasesWithIds)) {
-                    $idsOrAliases[$k] = $aliasesWithIds[$v];
-                } else {
-                    // Remove it completely, so it doesn't produce unexpected results later on with intval()
-                    unset($idsOrAliases[$k]);
-                }
-            }
-
-            $idsOrAliases = array_values($idsOrAliases);
+        if ($aliases === [] && $ids === []) {
+            return [];
         }
 
-        $ids = array_map(intval(...), $idsOrAliases);
+        $columns = ['type=?'];
+        $values = [NodeModel::TYPE_CONTENT];
 
-        $nodeModels = NodeModel::findBy(
-            ['id IN ('.implode(',', $ids).')', 'type=?'],
-            [NodeModel::TYPE_CONTENT, implode(',', $ids)],
-            ['order' => 'FIND_IN_SET(`id`, ?)'],
-        );
+        if ($aliases !== []) {
+            $columns[] = "alias IN ('" . implode("','", $aliases) . "')";
+        }
 
-        if (null === $nodeModels) {
+        if ($ids !== []) {
+            $columns[] = "id IN (" . implode(",", $ids) . ")";
+        }
+
+        if (null === ($nodeModels = NodeModel::findBy($columns, $values))) {
             return [];
+        }
+
+        $sortedNodeModels = [];
+
+        /** @var NodeModel $nodeModel */
+        foreach ($nodeModels as $nodeModel) {
+            // No strict check here
+            $sortedNodeModels[array_search($nodeModel->alias ?: $nodeModel->id, $idsOrAliases, false)] = $nodeModel;
         }
 
         $nodes = [];
 
         /** @var NodeModel $nodeModel */
-        foreach ($nodeModels as $nodeModel) {
+        foreach ($sortedNodeModels as $nodeModel) {
             $nodes[$nodeModel->id] = $this->generateBuffer($nodeModel);
         }
 
-        return array_filter($nodes, static fn ($buffer) => null !== $buffer);
+        return array_filter($nodes, static fn ($buffer) => '' !== $buffer);
     }
 
     private function generateBuffer(NodeModel $nodeModel): string
