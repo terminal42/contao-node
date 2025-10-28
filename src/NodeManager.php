@@ -40,19 +40,19 @@ class NodeManager
         $aliases = array_values(array_filter($idsOrAliases, static fn ($v) => \is_string($v) && !is_numeric($v)));
         $ids = array_map(intval(...), array_values(array_diff($idsOrAliases, $aliases)));
 
-        if ($aliases === [] && $ids === []) {
+        if ([] === $aliases && [] === $ids) {
             return [];
         }
 
         $columns = ['type=?'];
         $values = [NodeModel::TYPE_CONTENT];
 
-        if ($aliases !== []) {
-            $columns[] = "alias IN ('" . implode("','", $aliases) . "')";
+        if ([] !== $aliases) {
+            $columns[] = "alias IN ('".implode("','", $aliases)."')";
         }
 
-        if ($ids !== []) {
-            $columns[] = "id IN (" . implode(",", $ids) . ")";
+        if ([] !== $ids) {
+            $columns[] = 'id IN ('.implode(',', $ids).')';
         }
 
         if (null === ($nodeModels = NodeModel::findBy($columns, $values))) {

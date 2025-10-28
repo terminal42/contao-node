@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Terminal42\NodeBundle\Security\Voter\BackendAccessVoter;
 use Terminal42\NodeBundle\Security\Voter\NodeContentVoter;
 use Terminal42\NodeBundle\Security\Voter\NodePermissionVoter;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
