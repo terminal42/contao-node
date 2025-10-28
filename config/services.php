@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Terminal42\NodeBundle\InsertTag\NodeInsertTag;
-
 use Terminal42\NodeBundle\NodeManager;
 use Terminal42\NodeBundle\Picker\NodePickerProvider;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -15,7 +14,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     $services
         ->set(NodeInsertTag::class)
-        ->arg('$manager', NodeManager::class)
+        ->arg('$manager', service(NodeManager::class))
         ->arg('$logger', service('monolog.logger.contao'))
     ;
 
