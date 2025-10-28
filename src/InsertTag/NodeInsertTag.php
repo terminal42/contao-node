@@ -10,7 +10,6 @@ use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Environment;
 use Contao\StringUtil;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Terminal42\NodeBundle\NodeManager;
 
 #[AsInsertTag('insert_node')]
@@ -19,8 +18,6 @@ class NodeInsertTag implements InsertTagResolverNestedResolvedInterface
 {
     public function __construct(
         private readonly NodeManager $manager,
-
-        #[Autowire(service: 'monolog.logger.contao')]
         private readonly LoggerInterface|null $logger = null,
     )
     {
