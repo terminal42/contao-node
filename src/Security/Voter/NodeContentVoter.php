@@ -6,13 +6,14 @@ use Contao\CoreBundle\Security\Voter\DataContainer\AbstractDynamicPtableVoter;
 use Doctrine\DBAL\Connection;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Terminal42\NodeBundle\Model\NodeModel;
 use Terminal42\NodeBundle\Security\NodePermissions;
 
 class NodeContentVoter extends AbstractDynamicPtableVoter
 {
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
-        Connection $connection,
+        private readonly Connection $connection,
     ) {
         parent::__construct($connection);
     }
@@ -36,6 +37,16 @@ class NodeContentVoter extends AbstractDynamicPtableVoter
             return false;
         }
 
-        return $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_ACCESS_NODE], $id);
+        if (!$this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_ACCESS_NODE], $id)) {
+            return false;
+        }
+
+        $type = $this->connection->fetchOne('SELECT type FROM tl_node WHERE id = ?', [$id]);
+
+        if (NodeModel::TYPE_FOLDER === $type) {
+            return false;
+        }
+
+        return true;
     }
 }
