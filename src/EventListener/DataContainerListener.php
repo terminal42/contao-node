@@ -50,8 +50,8 @@ class DataContainerListener
         private readonly LoggerInterface $logger,
         private readonly RequestStack $requestStack,
         private readonly Security $security,
-        private readonly TranslatorInterface $translator,
         private readonly ManagerInterface $tagsManager,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

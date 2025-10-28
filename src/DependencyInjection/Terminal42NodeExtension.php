@@ -15,6 +15,11 @@ class Terminal42NodeExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../config'));
+
+        $loader->load('controllers.php');
+        $loader->load('listeners.php');
+        $loader->load('migrations.php');
+        $loader->load('security.php');
         $loader->load('services.php');
 
         if (class_exists(Configuration::class)) {

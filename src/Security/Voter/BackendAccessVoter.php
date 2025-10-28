@@ -7,8 +7,6 @@ namespace Terminal42\NodeBundle\Security\Voter;
 use Contao\BackendUser;
 use Contao\CoreBundle\Framework\ContaoFramework;
 use Contao\Database;
-use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
-use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -16,14 +14,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Terminal42\NodeBundle\Security\NodePermissions;
 
-#[AsDecorator('contao.security.backend_access_voter')]
 class BackendAccessVoter implements ResetInterface, VoterInterface, CacheableVoterInterface
 {
     private array $nodeMountsCache = [];
 
     public function __construct(
         private readonly ContaoFramework $contaoFramework,
-        #[AutowireDecorated]
         private readonly VoterInterface $inner,
     ) {
     }

@@ -3,36 +3,32 @@
 declare(strict_types=1);
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Terminal42\NodeBundle\EventListener\DataContainerListener;
 use Terminal42\NodeBundle\InsertTag\NodeInsertTag;
 
+use Terminal42\NodeBundle\NodeManager;
+use Terminal42\NodeBundle\Picker\NodePickerProvider;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
-
-    $services->defaults()
-        ->autoconfigure()
-        ->autowire()
-    ;
-
-    $services
-        ->load('Terminal42\\NodeBundle\\', __DIR__.'/../src')
-        ->exclude(__DIR__.'/../src/ContaoManager')
-        ->exclude(__DIR__.'/../src/DependencyInjection')
-        ->exclude(__DIR__.'/../src/Model')
-        ->exclude(__DIR__.'/../src/Widget')
-        ->exclude(__DIR__.'/../src/NodeElement.php')
-        ->exclude(__DIR__.'/../src/Terminal42NodeBundle.php')
-    ;
-
-    $services
-        ->set(DataContainerListener::class)
-        ->arg('$tagsManager', service('codefog_tags.manager.terminal42_node'))
-    ;
+    $services->defaults()->autoconfigure();
 
     $services
         ->set(NodeInsertTag::class)
+        ->arg('$manager', NodeManager::class)
         ->arg('$logger', service('monolog.logger.contao'))
+    ;
+
+    $services
+        ->set(NodeManager::class)
+        ->arg('$connection', service('database_connection'))
+        ->arg('$twig', service('twig'))
+    ;
+
+    $services
+        ->set(NodePickerProvider::class)
+        ->arg('$menuFactory', service('knp_menu.factory'))
+        ->arg('$router', service('router'))
+        ->arg('$translator', service('translator'))
     ;
 };
