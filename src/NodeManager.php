@@ -6,14 +6,17 @@ namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
 use Contao\Controller;
-use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Doctrine\DBAL\Connection;
 use Terminal42\NodeBundle\Model\NodeModel;
+use Twig\Environment;
 
 class NodeManager
 {
-    public function __construct(private readonly Connection $connection)
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly Environment $twig,
+    )
     {
     }
 
@@ -106,15 +109,13 @@ class NodeManager
             return implode('', array_map(static fn (NodeElement $v) => $v->getRenderedHtml(),$nodeElements));
         }
 
-        $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node/default');
-        $template->setData($nodeModel->row());
-        $template->elements = $nodeElements;
-
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
-        $template->class = !empty($cssID[1]) ? $cssID[1] : '';
-        $template->cssID = !empty($cssID[0]) ? $cssID[0] : '';
-
-        return $template->parse();
+        return $this->twig->render($nodeModel->nodeTpl ?: 'node/default', [
+            ...$nodeModel->row(),
+            'elements' => $elements,
+            'class' => !empty($cssID[1]) ? $cssID[1] : '',
+            'cssID' => !empty($cssID[0]) ? $cssID[0] : '',
+        ]);
     }
 }
