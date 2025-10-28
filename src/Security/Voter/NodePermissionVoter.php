@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\Security\Voter;
 
 use Contao\BackendUser;
@@ -21,8 +23,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
     public function __construct(
         private readonly AccessDecisionManagerInterface $accessDecisionManager,
         private readonly ContaoFramework $contaoFramework,
-    )
-    {
+    ) {
     }
 
     protected function getTable(): string
@@ -30,7 +31,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
         return 'tl_node';
     }
 
-    protected function hasAccess(TokenInterface $token, UpdateAction|CreateAction|ReadAction|DeleteAction $action): bool
+    protected function hasAccess(TokenInterface $token, CreateAction|DeleteAction|ReadAction|UpdateAction $action): bool
     {
         if ($this->accessDecisionManager->decide($token, ['ROLE_ADMIN'])) {
             return true;

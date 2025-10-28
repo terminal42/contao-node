@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\Security\Voter;
 
 use Contao\BackendUser;
@@ -20,11 +22,9 @@ class BackendAccessVoter implements ResetInterface, VoterInterface, CacheableVot
 
     public function __construct(
         private readonly ContaoFramework $contaoFramework,
-
         #[AutowireDecorated]
         private readonly VoterInterface $inner,
-    )
-    {
+    ) {
     }
 
     public function reset(): void
@@ -57,7 +57,7 @@ class BackendAccessVoter implements ResetInterface, VoterInterface, CacheableVot
     public function vote(TokenInterface $token, mixed $subject, array $attributes): int
     {
         foreach ($attributes as $attribute) {
-            if ($attribute === NodePermissions::USER_CAN_ACCESS_NODE) {
+            if (NodePermissions::USER_CAN_ACCESS_NODE === $attribute) {
                 return $this->voteOnAttribute($token, $subject, $attribute) ? self::ACCESS_GRANTED : self::ACCESS_DENIED;
             }
         }

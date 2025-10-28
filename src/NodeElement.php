@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle;
 
 class NodeElement
@@ -7,8 +9,7 @@ class NodeElement
     public function __construct(
         private readonly array $row,
         private readonly string $renderedHtml,
-    )
-    {
+    ) {
     }
 
     public function getRow(): array

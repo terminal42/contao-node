@@ -16,8 +16,7 @@ class NodeManager
     public function __construct(
         private readonly Connection $connection,
         private readonly Environment $twig,
-    )
-    {
+    ) {
     }
 
     public function generateSingle(int|string $idOrAlias): string|null
@@ -41,12 +40,12 @@ class NodeManager
             return [];
         }
 
-        $isAlias = static fn ($v) => is_string($v) && !is_numeric($v);
+        $isAlias = static fn ($v) => \is_string($v) && !is_numeric($v);
         $aliases = array_filter($idsOrAliases, $isAlias);
 
         // If there are aliases, fetch their IDs and put them in respective places
-        if ($aliases !== []) {
-            $aliasesWithIds = $this->connection->fetchAllKeyValue("SELECT alias, id FROM tl_node WHERE id IN ('" . \implode("','", $aliases) . "') ORDER BY FIND_IN_SET(`alias`, '" . implode(',', $aliases) . "')");
+        if ([] !== $aliases) {
+            $aliasesWithIds = $this->connection->fetchAllKeyValue("SELECT alias, id FROM tl_node WHERE id IN ('".implode("','", $aliases)."') ORDER BY FIND_IN_SET(`alias`, '".implode(',', $aliases)."')");
 
             foreach ($idsOrAliases as $k => $v) {
                 if (!$isAlias($v)) {
@@ -54,7 +53,7 @@ class NodeManager
                 }
 
                 // Replace the alias with ID
-                if (array_key_exists($v, $aliasesWithIds)) {
+                if (\array_key_exists($v, $aliasesWithIds)) {
                     $idsOrAliases[$k] = $aliasesWithIds[$v];
                 } else {
                     // Remove it completely, so it doesn't produce unexpected results later on with intval()
@@ -106,16 +105,19 @@ class NodeManager
         }
 
         if (!$nodeModel->wrapper) {
-            return implode('', array_map(static fn (NodeElement $v) => $v->getRenderedHtml(),$nodeElements));
+            return implode('', array_map(static fn (NodeElement $v) => $v->getRenderedHtml(), $nodeElements));
         }
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
-        return $this->twig->render($nodeModel->nodeTpl ?: 'node/default', [
-            ...$nodeModel->row(),
-            'elements' => $elements,
-            'class' => !empty($cssID[1]) ? $cssID[1] : '',
-            'cssID' => !empty($cssID[0]) ? $cssID[0] : '',
-        ]);
+        return $this->twig->render(
+            $nodeModel->nodeTpl ?: 'node/default',
+            [
+                ...$nodeModel->row(),
+                'elements' => $elements,
+                'class' => !empty($cssID[1]) ? $cssID[1] : '',
+                'cssID' => !empty($cssID[0]) ? $cssID[0] : '',
+            ],
+        );
     }
 }

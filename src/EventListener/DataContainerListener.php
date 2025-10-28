@@ -135,19 +135,19 @@ class DataContainerListener
 
         $extras = [];
 
-        if ($languages !== []) {
+        if ([] !== $languages) {
             $extras[] = implode(', ', $languages);
         }
 
-        if ($tags !== []) {
+        if ([] !== $tags) {
             $extras[] = implode(', ', $tags);
         }
 
-        if ($row['type'] === NodeModel::TYPE_CONTENT) {
-            $extras[] = sprintf('ID: %d', $row['id']);
+        if (NodeModel::TYPE_CONTENT === $row['type']) {
+            $extras[] = \sprintf('ID: %d', $row['id']);
 
             if ($row['alias']) {
-                $extras[] = sprintf('%s: %s', $GLOBALS['TL_LANG']['tl_node']['alias'][0], $row['alias']);
+                $extras[] = \sprintf('%s: %s', $GLOBALS['TL_LANG']['tl_node']['alias'][0], $row['alias']);
             }
         }
 
@@ -157,7 +157,7 @@ class DataContainerListener
             Backend::addToUrl('nn='.$row['id']),
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            $extras ? ' '.implode('', array_map(static fn (string $v) => sprintf('<span class="tl_gray" style="margin-left:3px;">[%s]</span>', $v), $extras)) : '',
+            $extras ? ' '.implode('', array_map(static fn (string $v) => \sprintf('<span class="tl_gray" style="margin-left:3px;">[%s]</span>', $v), $extras)) : '',
         );
     }
 
@@ -323,7 +323,7 @@ class DataContainerListener
         }
 
         // Set root IDs
-        if (empty($user->nodeMounts) || !is_array($user->nodeMounts)) {
+        if (empty($user->nodeMounts) || !\is_array($user->nodeMounts)) {
             $root = [0];
         } else {
             $root = $user->nodeMounts;
@@ -393,7 +393,7 @@ class DataContainerListener
                 }
 
                 // Do not show the mounted nodes
-                if (!$this->security->isGranted(ContaoCorePermissions::DC_PREFIX . $dc->table, new ReadAction($dc->table, $node))) {
+                if (!$this->security->isGranted(ContaoCorePermissions::DC_PREFIX.$dc->table, new ReadAction($dc->table, $node))) {
                     break;
                 }
 
@@ -403,7 +403,7 @@ class DataContainerListener
 
         // Check whether the node is mounted
         foreach ($ids as $id) {
-            if (!$this->security->isGranted(ContaoCorePermissions::DC_PREFIX . $dc->table, new ReadAction($dc->table, ['id' => $id]))) {
+            if (!$this->security->isGranted(ContaoCorePermissions::DC_PREFIX.$dc->table, new ReadAction($dc->table, ['id' => $id]))) {
                 $session->set(self::BREADCRUMB_SESSION_KEY, 0);
 
                 throw new AccessDeniedException('Node ID '.$nodeId.' is not mounted.');

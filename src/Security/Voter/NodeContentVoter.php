@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\Security\Voter;
 
 use Contao\CoreBundle\Security\Voter\DataContainer\AbstractDynamicPtableVoter;

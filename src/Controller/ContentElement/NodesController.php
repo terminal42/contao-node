@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\Controller\ContentElement;
 
 use Contao\ContentModel;
@@ -21,6 +23,14 @@ class NodesController extends AbstractContentElementController
     {
     }
 
+    public static function getSubscribedServices(): array
+    {
+        $services = parent::getSubscribedServices();
+        $services['translator'] = TranslatorInterface::class;
+
+        return $services;
+    }
+
     protected function getResponse(FragmentTemplate $template, ContentModel $model, Request $request): Response
     {
         if ($this->isBackendScope($request)) {
@@ -28,13 +38,5 @@ class NodesController extends AbstractContentElementController
         }
 
         return $this->generateNodesResponse($template, $model);
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        $services = parent::getSubscribedServices();
-        $services['translator'] = TranslatorInterface::class;
-
-        return $services;
     }
 }

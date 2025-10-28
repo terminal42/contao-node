@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\Controller\FrontendModule;
 
 use Contao\CoreBundle\Controller\FrontendModule\AbstractFrontendModuleController;
@@ -21,16 +23,16 @@ class NodesController extends AbstractFrontendModuleController
     {
     }
 
-    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
-    {
-        return $this->generateNodesResponse($template, $model);
-    }
-
     public static function getSubscribedServices(): array
     {
         $services = parent::getSubscribedServices();
         $services['translator'] = TranslatorInterface::class;
 
         return $services;
+    }
+
+    protected function getResponse(FragmentTemplate $template, ModuleModel $model, Request $request): Response
+    {
+        return $this->generateNodesResponse($template, $model);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\Controller;
 
 use Contao\ContentModel;
@@ -19,7 +21,7 @@ trait NodesTrait
     {
         $ids = StringUtil::deserialize($model->nodes);
 
-        if (!is_array($ids) || [] === $ids) {
+        if (!\is_array($ids) || [] === $ids) {
             return [];
         }
 
@@ -86,10 +88,10 @@ trait NodesTrait
             return false;
         }
 
-        if ($model->ptable !== 'tl_node') {
+        if ('tl_node' !== $model->ptable) {
             return false;
         }
 
-        return in_array((int) $model->pid, $ids, true);
+        return \in_array((int) $model->pid, $ids, true);
     }
 }

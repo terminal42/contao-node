@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Terminal42\NodeBundle\InsertTag;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsInsertTag;
@@ -19,8 +21,7 @@ class NodeInsertTag implements InsertTagResolverNestedResolvedInterface
     public function __construct(
         private readonly NodeManager $manager,
         private readonly LoggerInterface|null $logger = null,
-    )
-    {
+    ) {
     }
 
     public function __invoke(ResolvedInsertTag $insertTag): InsertTagResult
