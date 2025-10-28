@@ -110,14 +110,17 @@ class NodeManager
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
-        return $this->twig->render(
-            $nodeModel->nodeTpl ?: 'node/default',
-            [
-                ...$nodeModel->row(),
-                'elements' => $elements,
-                'class' => !empty($cssID[1]) ? $cssID[1] : '',
-                'cssID' => !empty($cssID[0]) ? $cssID[0] : '',
-            ],
-        );
+        if ($nodeModel->nodeTpl) {
+            $templateName = sprintf('@Contao/%s.html.twig', $nodeModel->nodeTpl);
+        } else {
+            $templateName = '@Contao/node/default.html.twig';
+        }
+
+        return $this->twig->render($templateName, [
+            ...$nodeModel->row(),
+            'elements' => $nodeElements,
+            'class' => !empty($cssID[1]) ? $cssID[1] : '',
+            'cssID' => !empty($cssID[0]) ? $cssID[0] : '',
+        ]);
     }
 }
