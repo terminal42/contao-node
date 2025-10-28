@@ -111,7 +111,7 @@ class NodeManager
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
         if ($nodeModel->nodeTpl) {
-            $templateName = sprintf('@Contao/%s.html.twig', $nodeModel->nodeTpl);
+            $templateName = \sprintf('@Contao/%s.html.twig', $nodeModel->nodeTpl);
         } else {
             $templateName = '@Contao/node/default.html.twig';
         }

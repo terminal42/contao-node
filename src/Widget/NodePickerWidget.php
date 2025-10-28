@@ -117,11 +117,11 @@ class NodePickerWidget extends Widget
             return '';
         }
 
-        if (!str_contains($varInput, ',')) {
+        if (!str_contains((string) $varInput, ',')) {
             return $this->multiple ? [(int) $varInput] : (int) $varInput;
         }
 
-        $value = array_map('intval', array_filter(explode(',', $varInput)));
+        $value = array_map('intval', array_filter(explode(',', (string) $varInput)));
 
         return $this->multiple ? $value : $value[0];
     }

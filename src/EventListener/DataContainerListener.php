@@ -350,7 +350,7 @@ class DataContainerListener
             }
 
             $session->set(self::BREADCRUMB_SESSION_KEY, Input::get('nn', true));
-            Controller::redirect(preg_replace('/&nn=[^&]*/', '', Environment::get('request')));
+            Controller::redirect(preg_replace('/&nn=[^&]*/', '', (string) Environment::get('request')));
         }
 
         if (($nodeId = $session->get(self::BREADCRUMB_SESSION_KEY)) < 1) {

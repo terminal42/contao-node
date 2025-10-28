@@ -4,7 +4,7 @@ use Doctrine\DBAL\Types\Types;
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'nodesWrapper';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['nodes'] = '{type_legend},type;{include_legend},nodes,nodesWrapper;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['nodes'] = '{type_legend},type;{include_legend},nodes,nodesWrapper;{template_legend:collapsed},customTpl;{protected_legend:collapsed},protected;{expert_legend:collapsed},guests;{invisible_legend:collapsed},invisible,start,stop';
 
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['nodesWrapper'] = 'cssID';
 

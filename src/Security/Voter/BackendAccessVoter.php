@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Contracts\Service\ResetInterface;
 use Terminal42\NodeBundle\Security\NodePermissions;
@@ -54,7 +55,7 @@ class BackendAccessVoter implements ResetInterface, VoterInterface, CacheableVot
         return false;
     }
 
-    public function vote(TokenInterface $token, mixed $subject, array $attributes): int
+    public function vote(TokenInterface $token, mixed $subject, array $attributes, Vote|null $vote = null): int
     {
         foreach ($attributes as $attribute) {
             if (NodePermissions::USER_CAN_ACCESS_NODE === $attribute) {

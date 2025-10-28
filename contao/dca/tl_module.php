@@ -8,7 +8,7 @@ System::loadLanguageFile('tl_content');
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'nodesWrapper';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['nodes'] = '{title_legend},name,type;{include_legend},nodes,nodesWrapper;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['nodes'] = '{title_legend},name,type;{include_legend},nodes,nodesWrapper;{template_legend:collapsed},customTpl;{protected_legend:collapsed},protected;{expert_legend:collapsed},guests';
 
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['nodesWrapper'] = &$GLOBALS['TL_DCA']['tl_content']['subpalettes']['nodesWrapper'];
 

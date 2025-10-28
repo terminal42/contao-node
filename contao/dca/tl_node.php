@@ -46,9 +46,9 @@ $GLOBALS['TL_DCA']['tl_node'] = [
     // Palettes
     'palettes' => [
         '__selector__' => ['type', 'wrapper', 'protected'],
-        'default' => '{name_legend},name,type;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:hide},protected,guests',
+        'default' => '{name_legend},name,type;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:collapsed},protected,guests',
         NodeModel::TYPE_FOLDER => '{name_legend},name,type;{filter_legend},languages,tags',
-        NodeModel::TYPE_CONTENT => '{name_legend},name,type,alias;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:hide},protected,guests',
+        NodeModel::TYPE_CONTENT => '{name_legend},name,type,alias;{wrapper_legend},wrapper;{filter_legend},languages,tags;{protected_legend:collapsed},protected,guests',
     ],
 
     // Subpalettes
