@@ -45,8 +45,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
             $action instanceof CreateAction => $this->canCreate($action, $token),
             $action instanceof ReadAction => $this->canRead($action, $token),
             $action instanceof UpdateAction => $this->canUpdate($action, $token),
-            $action instanceof DeleteAction => $this->canDelete($action, $token),
-            default => false,
+            default => $this->canDelete($action, $token),
         };
     }
 
@@ -110,12 +109,8 @@ class NodePermissionVoter extends AbstractDataContainerVoter
             return false;
         }
 
-        if ($changePid) {
-            $newPid = (int) $action->getNewPid();
-
-            if (!$this->canEdit($token, $newPid)) {
-                return false;
-            }
+        if ($changePid && !$this->canEdit($token, $action->getNewPid())) {
+            return false;
         }
 
         unset($newRecord['pid'], $newRecord['sorting'], $newRecord['tstamp']);
@@ -128,7 +123,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
         return $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_EDIT_NODE]);
     }
 
-    private function canEdit(TokenInterface $token, int $nodeId): bool
+    private function canEdit(TokenInterface $token, string|null $nodeId): bool
     {
         return $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_ACCESS_NODE], $nodeId)
             && $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_EDIT_NODE]);
@@ -140,7 +135,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
             && $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_DELETE_NODE]);
     }
 
-    private function canAccessNode(TokenInterface $token, int $nodeId): bool
+    private function canAccessNode(TokenInterface $token, string|null $nodeId): bool
     {
         return $this->accessDecisionManager->decide($token, [NodePermissions::USER_CAN_ACCESS_NODE], $nodeId);
     }

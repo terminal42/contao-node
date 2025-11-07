@@ -21,6 +21,9 @@ class NodeModel extends Model
      */
     protected static $strTable = 'tl_node';
 
+    /**
+     * @return Collection<ContentModel>|null
+     */
     public function getContentElements(): Collection|null
     {
         return ContentModel::findPublishedByPidAndTable($this->id, static::getTable());

@@ -193,7 +193,7 @@ class DataContainerListener
     }
 
     #[AsHook('executePostActions')]
-    public function onExecutePostActions($action, DataContainer $dc): void
+    public function onExecutePostActions(string $action, DataContainer $dc): void
     {
         if ('reloadNodePickerWidget' === $action) {
             $this->reloadNodePickerWidget($dc);

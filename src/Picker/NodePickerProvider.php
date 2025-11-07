@@ -36,7 +36,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
         return $attributes;
     }
 
-    public function convertDcaValue(PickerConfig $config, $value): int|string
+    public function convertDcaValue(PickerConfig $config, mixed $value): int|string
     {
         return (int) $value;
     }
