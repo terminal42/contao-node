@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
 use Terminal42\NodeBundle\InsertTag\NodeInsertTag;
 use Terminal42\NodeBundle\NodeManager;
 use Terminal42\NodeBundle\Picker\NodePickerProvider;
-
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
     $services = $containerConfigurator->services();
