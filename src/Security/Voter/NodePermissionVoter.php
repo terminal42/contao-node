@@ -45,7 +45,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
             $action instanceof CreateAction => $this->canCreate($action, $token),
             $action instanceof ReadAction => $this->canRead($action, $token),
             $action instanceof UpdateAction => $this->canUpdate($action, $token),
-            default => $this->canDelete($action, $token),
+            default => $this->canDelete($action, $token), // DeleteAction
         };
     }
 
