@@ -1,0 +1,17 @@
+{% extends "@Contao/frontend_module/_base.html.twig" %}
+
+{% block wrapper %}
+    {% if nodes_wrapper ?? false %}
+        <{% block wrapper_tag %}div{% endblock %}{% block attributes %}{{ attributes }}{% endblock %}>
+    {% endif %}
+
+    {%- block inner %}
+        {% for node in nodes %}
+            {{ node|raw }}
+        {% endfor %}
+    {% endblock -%}
+
+    {% if nodes_wrapper ?? false %}
+        </{{ block('wrapper_tag') }}>
+    {% endif %}
+{% endblock %}

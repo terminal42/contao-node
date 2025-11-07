@@ -4,6 +4,7 @@ use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Název', 'Zadejte prosím vlastní název tohoto prvku.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Typ', 'Zde můžete vybrat jeden z dostupných typů.'];
+$GLOBALS['TL_LANG']['tl_node']['alias'] = ['Alias uzlu', 'Zde můžete zadat alias uzlu, který lze použít k odkazování na uzel pomocí vloženého tagu.'];
 $GLOBALS['TL_LANG']['tl_node']['languages'] = ['Jazyky', 'Zde můžete nastavit jazyky, které lze použít pro filtraci prvků v backendu.'];
 $GLOBALS['TL_LANG']['tl_node']['tags'] = ['Štítky', 'Sem můžete zadat štítky, které lze použít pro filtraci prvků v backendu.'];
 $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Rodičkovský node'];

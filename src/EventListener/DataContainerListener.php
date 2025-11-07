@@ -8,11 +8,17 @@ use Codefog\HasteBundle\Model\DcaRelationsModel;
 use Codefog\TagsBundle\Manager\ManagerInterface;
 use Codefog\TagsBundle\Tag;
 use Contao\Backend;
+use Contao\BackendUser;
 use Contao\Controller;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsCallback;
+use Contao\CoreBundle\DependencyInjection\Attribute\AsHook;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Exception\ResponseException;
 use Contao\CoreBundle\Intl\Locales;
 use Contao\CoreBundle\Monolog\ContaoContext;
+use Contao\CoreBundle\Security\ContaoCorePermissions;
+use Contao\CoreBundle\Security\DataContainer\ReadAction;
+use Contao\CoreBundle\Twig\Finder\FinderFactory;
 use Contao\DataContainer;
 use Contao\Environment;
 use Contao\Image;
@@ -21,15 +27,16 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Doctrine\DBAL\Connection;
-use Haste\Model\Model;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Terminal42\NodeBundle\Model\NodeModel;
-use Terminal42\NodeBundle\PermissionChecker;
+use Terminal42\NodeBundle\Security\NodePermissions;
 use Terminal42\NodeBundle\Widget\NodePickerWidget;
 
 class DataContainerListener
@@ -37,28 +44,26 @@ class DataContainerListener
     public const BREADCRUMB_SESSION_KEY = 'tl_node_node';
 
     public function __construct(
-        private Connection $db,
-        private Locales $locales,
-        private LoggerInterface $logger,
-        private PermissionChecker $permissionChecker,
-        private RequestStack $requestStack,
-        private ManagerInterface $tagsManager,
+        private readonly Connection $connection,
+        private readonly FinderFactory $finderFactory,
+        private readonly Locales $locales,
+        private readonly LoggerInterface $logger,
+        private readonly RequestStack $requestStack,
+        private readonly Security $security,
+        private readonly ManagerInterface $tagsManager,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
-    /**
-     * On load callback.
-     */
+    #[AsCallback('tl_node', 'config.onload')]
     public function onLoadCallback(DataContainer $dc): void
     {
         $this->addBreadcrumb($dc);
-        $this->checkPermissions($dc);
+        $this->checkPermissions();
         $this->toggleSwitchToEditFlag($dc);
     }
 
-    /**
-     * On paste button callback.
-     */
+    #[AsCallback('tl_node', 'list.sorting.paste_button_callback')]
     public function onPasteButtonCallback(DataContainer $dc, array $row, string $table, bool $cr, array|false|null $clipboard = null): string
     {
         $disablePA = false;
@@ -75,9 +80,8 @@ class DataContainerListener
             $disablePI = true;
         }
 
-        // Disable "paste after" button if the parent node is a root node and the user is
-        // not allowed
-        if (!$disablePA && !$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT) && (!$row['pid'] || \in_array((int) $row['id'], $dc->rootIds, true))) {
+        // Disable "paste after" button if the parent node is a root node and the user is not allowed
+        if (!$disablePA && !$this->security->isGranted(NodePermissions::USER_CAN_CREATE_ROOT_NODES) && (!$row['pid'] || \in_array((int) $row['id'], $dc->rootIds, true))) {
             $disablePA = true;
         }
 
@@ -94,77 +98,13 @@ class DataContainerListener
         return $return.($disablePI ? Image::getHtml('pasteinto_.svg').' ' : '<a href="'.Backend::addToUrl('act='.$clipboard['mode'].'&amp;mode=2&amp;pid='.$row['id'].(!\is_array($clipboard['id']) ? '&amp;id='.$clipboard['id'] : '')).'" title="'.StringUtil::specialchars(\sprintf($GLOBALS['TL_LANG'][$table]['pasteinto'][1], $row['id'])).'" onclick="Backend.getScrollOffset()">'.$imagePasteInto.'</a> ');
     }
 
-    /**
-     * On "edit" button callback.
-     */
-    public function onEditButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
+    #[AsCallback('tl_node', 'list.operations.children.button')]
+    public function onChildrenButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
     {
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, NodeModel::TYPE_FOLDER !== $row['type'] && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT));
+        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, NodeModel::TYPE_FOLDER !== $row['type']);
     }
 
-    /**
-     * On "edit header" button callback.
-     */
-    public function onEditHeaderButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
-    {
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_EDIT));
-    }
-
-    /**
-     * On "copy" button callback.
-     */
-    public function onCopyButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
-    {
-        if ($GLOBALS['TL_DCA'][$table]['config']['closed'] ?? null) {
-            return '';
-        }
-
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE));
-    }
-
-    /**
-     * On "copy childs" button callback.
-     */
-    public function onCopyChildsButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes, string $table): string
-    {
-        if ($GLOBALS['TL_DCA'][$table]['config']['closed'] ?? null) {
-            return '';
-        }
-
-        $active = (NodeModel::TYPE_FOLDER === $row['type']) && $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE);
-
-        // Make the button active only if there are subnodes
-        if ($active) {
-            $active = $this->db->fetchOne("SELECT COUNT(*) FROM $table WHERE pid=?", [$row['id']]) > 0;
-        }
-
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
-    }
-
-    /**
-     * On "delete" button callback.
-     */
-    public function onDeleteButtonCallback(array $row, string $href, string $label, string $title, string $icon, string $attributes): string
-    {
-        $active = true;
-
-        // Allow delete if the user has permission
-        if (!$this->permissionChecker->isUserAdmin()) {
-            $rootIds = (array) func_get_arg(7);
-            $active = $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE);
-
-            // If the node is a root one, check if the user has permission to manage it
-            if ($active && \in_array((int) $row['id'], $rootIds, true)) {
-                $active = $this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT);
-            }
-        }
-
-        return $this->generateButton($row, $href, $label, $title, $icon, $attributes, $active);
-    }
-
-    /**
-     * On label callback.
-     */
+    #[AsCallback('tl_node', 'list.label.label')]
     public function onLabelCallback(array $row, string $label, DataContainer|null $dc = null, string $imageAttribute = '', bool $returnImage = false): string
     {
         $image = NodeModel::TYPE_CONTENT === $row['type'] ? 'articles.svg' : 'folderC.svg';
@@ -183,12 +123,7 @@ class DataContainerListener
         }
 
         $tags = [];
-
-        if (class_exists(DcaRelationsModel::class)) {
-            $tagIds = DcaRelationsModel::getRelatedValues('tl_node', 'tags', $row['id']);
-        } else {
-            $tagIds = Model::getRelatedValues('tl_node', 'tags', $row['id']);
-        }
+        $tagIds = DcaRelationsModel::getRelatedValues('tl_node', 'tags', $row['id']);
 
         // Generate the tags
         if (\count($tagIds) > 0) {
@@ -198,31 +133,67 @@ class DataContainerListener
             }
         }
 
+        $extras = [];
+
+        if ([] !== $languages) {
+            $extras[] = implode(', ', $languages);
+        }
+
+        if ([] !== $tags) {
+            $extras[] = implode(', ', $tags);
+        }
+
+        if (NodeModel::TYPE_CONTENT === $row['type']) {
+            $extras[] = \sprintf('ID: %d', $row['id']);
+
+            if ($row['alias']) {
+                $extras[] = \sprintf('%s: %s', $GLOBALS['TL_LANG']['tl_node']['alias'][0], $row['alias']);
+            }
+        }
+
         return \sprintf(
-            '%s <a href="%s" title="%s">%s</a>%s%s',
+            '%s <a href="%s" title="%s">%s</a>%s',
             Image::getHtml($image, '', $imageAttribute),
             Backend::addToUrl('nn='.$row['id']),
             StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['selectNode']),
             $label,
-            \count($languages) > 0 ? \sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $languages)) : '',
-            \count($tags) > 0 ? \sprintf(' <span class="tl_gray" style="margin-left:3px;">[%s]</span>', implode(', ', $tags)) : '',
+            $extras ? ' '.implode('', array_map(static fn (string $v) => \sprintf('<span class="tl_gray" style="margin-left:3px;">[%s]</span>', $v), $extras)) : '',
         );
     }
 
-    /**
-     * On languages options callback.
-     */
+    #[AsCallback('tl_node', 'fields.languages.options')]
     public function onLanguagesOptionsCallback(): array
     {
         return $this->locales->getLocales(null, true);
     }
 
-    /**
-     * On execute the post actions.
-     *
-     * @param string $action
-     */
-    public function onExecutePostActions($action, DataContainer $dc): void
+    #[AsCallback('tl_node', 'fields.groups.options')]
+    public function onGroupsOptionsCallback(): array
+    {
+        $options = [-1 => $this->translator->trans('MSC.guests', [], 'contao_default')];
+        $groups = $this->connection->fetchAllAssociative('SELECT id, name FROM tl_member_group WHERE tstamp>0 ORDER BY name');
+
+        foreach ($groups as $group) {
+            $options[$group['id']] = $group['name'];
+        }
+
+        return $options;
+    }
+
+    #[AsCallback('tl_node', 'fields.nodeTpl.options')]
+    public function onNodeTplOptionsCallback(): array
+    {
+        return $this->finderFactory
+            ->create()
+            ->identifier('node')
+            ->extension('html.twig')
+            ->withVariants()
+            ->asTemplateOptions()
+        ;
+    }
+
+    #[AsHook('executePostActions')]
+    public function onExecutePostActions(string $action, DataContainer $dc): void
     {
         if ('reloadNodePickerWidget' === $action) {
             $this->reloadNodePickerWidget($dc);
@@ -272,8 +243,8 @@ class DataContainerListener
         $value = null;
 
         // Load the value
-        if ('overrideAll' !== Input::get('act') && $id > 0 && $this->db->createSchemaManager()->tablesExist([$dc->table])) {
-            $row = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+        if ('overrideAll' !== Input::get('act') && $id > 0 && $this->connection->createSchemaManager()->tablesExist([$dc->table])) {
+            $row = $this->connection->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
             // The record does not exist
             if (!$row) {
@@ -324,110 +295,41 @@ class DataContainerListener
      */
     private function toggleSwitchToEditFlag(DataContainer $dc): void
     {
-        if (!$dc->id || !$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CONTENT)) {
+        if (!$dc->id) {
             return;
         }
 
-        $type = $this->db->fetchOne('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
+        if (!$this->security->isGranted(NodePermissions::USER_CAN_EDIT_NODE_CONTENT)) {
+            return;
+        }
+
+        $type = $this->connection->fetchOne('SELECT type FROM tl_node WHERE id=?', [$dc->id]);
 
         if (NodeModel::TYPE_CONTENT === $type) {
             $GLOBALS['TL_DCA'][$dc->table]['config']['switchToEdit'] = true;
         }
     }
 
-    /**
-     * Check the permissions.
-     */
-    private function checkPermissions(DataContainer $dc): void
+    private function checkPermissions(): void
     {
-        if ($this->permissionChecker->isUserAdmin()) {
+        $user = $this->security->getUser();
+
+        if (!$user instanceof BackendUser) {
             return;
         }
 
-        // Close the table if user is not allowed to create new records
-        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_CREATE)) {
-            $GLOBALS['TL_DCA'][$dc->table]['config']['closed'] = true;
-            $GLOBALS['TL_DCA'][$dc->table]['config']['notCopyable'] = true;
+        if ($user->isAdmin) {
+            return;
         }
 
-        // Set the flag if user is not allowed to edit records
-        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_EDIT)) {
-            $GLOBALS['TL_DCA'][$dc->table]['config']['notEditable'] = true;
+        // Set root IDs
+        if (empty($user->nodeMounts) || !\is_array($user->nodeMounts)) {
+            $root = [0];
+        } else {
+            $root = $user->nodeMounts;
         }
 
-        // Set the flag if user is not allowed to delete records
-        if (!$this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_DELETE)) {
-            $GLOBALS['TL_DCA'][$dc->table]['config']['notDeletable'] = true;
-        }
-
-        $session = $this->requestStack->getSession()->all();
-
-        // Filter allowed page IDs
-        if (\is_array($session['CURRENT']['IDS'] ?? null)) {
-            $session['CURRENT']['IDS'] = $this->permissionChecker->filterAllowedIds(
-                $session['CURRENT']['IDS'],
-                'deleteAll' === Input::get('act') ? PermissionChecker::PERMISSION_DELETE : PermissionChecker::PERMISSION_EDIT,
-            );
-
-            $this->requestStack->getSession()->replace($session);
-        }
-
-        // Limit the allowed roots for the user
-        if (null !== ($roots = $this->permissionChecker->getUserAllowedRoots())) {
-            if (!empty($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root']) && \is_array($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'])) {
-                $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = array_intersect($GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'], $roots);
-            } else {
-                $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['root'] = $roots;
-            }
-
-            // Allow root paste if the user has enough permission
-            if ($this->permissionChecker->hasUserPermission(PermissionChecker::PERMISSION_ROOT)) {
-                $GLOBALS['TL_DCA'][$dc->table]['list']['sorting']['rootPaste'] = true;
-            }
-
-            // Check current action
-            if (($action = Input::get('act')) && 'paste' !== $action) {
-                switch ($action) {
-                    case 'edit':
-                        $nodeId = (int) Input::get('id');
-
-                        // Dynamically add the record to the user profile
-                        if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                            /** @var AttributeBagInterface $sessionBag */
-                            $sessionBag = $this->requestStack->getSession()->getbag('contao_backend');
-
-                            $newRecords = $sessionBag->get('new_records');
-                            $newRecords = \is_array($newRecords[$dc->table]) ? array_map('intval', $newRecords[$dc->table]) : [];
-
-                            if (\in_array($nodeId, $newRecords, true)) {
-                                $this->permissionChecker->addNodeToAllowedRoots($nodeId);
-                            }
-                        }
-                        // no break;
-
-                    case 'copy':
-                    case 'delete':
-                    case 'show':
-                        if (!isset($nodeId)) {
-                            $nodeId = (int) Input::get('id');
-                        }
-
-                        if (!$this->permissionChecker->isUserAllowedNode($nodeId)) {
-                            throw new AccessDeniedException(\sprintf('Not enough permissions to %s node ID %s.', $action, $nodeId));
-                        }
-                        break;
-
-                    case 'editAll':
-                    case 'deleteAll':
-                    case 'overrideAll':
-                        if (\is_array($session['CURRENT']['IDS'])) {
-                            $session['CURRENT']['IDS'] = array_intersect($session['CURRENT']['IDS'], $roots);
-                            $this->requestStack->getSession()->replace($session);
-                        }
-                        break;
-                }
-            }
-        }
+        $GLOBALS['TL_DCA']['tl_node']['list']['sorting']['root'] = $root;
     }
 
     /**
@@ -448,7 +350,7 @@ class DataContainerListener
             }
 
             $session->set(self::BREADCRUMB_SESSION_KEY, Input::get('nn', true));
-            Controller::redirect(preg_replace('/&nn=[^&]*/', '', Environment::get('request')));
+            Controller::redirect(preg_replace('/&nn=[^&]*/', '', (string) Environment::get('request')));
         }
 
         if (($nodeId = $session->get(self::BREADCRUMB_SESSION_KEY)) < 1) {
@@ -468,7 +370,7 @@ class DataContainerListener
             $id = $nodeId;
 
             do {
-                $node = $this->db->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
+                $node = $this->connection->fetchAssociative("SELECT * FROM {$dc->table} WHERE id=?", [$id]);
 
                 if (!$node) {
                     // Currently selected node does not exist
@@ -491,7 +393,7 @@ class DataContainerListener
                 }
 
                 // Do not show the mounted nodes
-                if (!$this->permissionChecker->isUserAdmin() && $this->permissionChecker->isUserAllowedRootNode($node['id'])) {
+                if (!$this->security->isGranted(ContaoCorePermissions::DC_PREFIX.$dc->table, new ReadAction($dc->table, $node))) {
                     break;
                 }
 
@@ -500,10 +402,12 @@ class DataContainerListener
         }
 
         // Check whether the node is mounted
-        if (!$this->permissionChecker->isUserAllowedRootNode($ids)) {
-            $session->set(self::BREADCRUMB_SESSION_KEY, 0);
+        foreach ($ids as $id) {
+            if (!$this->security->isGranted(ContaoCorePermissions::DC_PREFIX.$dc->table, new ReadAction($dc->table, ['id' => $id]))) {
+                $session->set(self::BREADCRUMB_SESSION_KEY, 0);
 
-            throw new AccessDeniedException('Node ID '.$nodeId.' is not mounted.');
+                throw new AccessDeniedException('Node ID '.$nodeId.' is not mounted.');
+            }
         }
 
         // Limit tree

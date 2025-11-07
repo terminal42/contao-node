@@ -35,12 +35,7 @@ class NodePickerWidget extends Widget
      */
     protected $strTemplate = 'be_widget';
 
-    /**
-     * Generate the widget and return it as string.
-     *
-     * @return string
-     */
-    public function generate()
+    public function generate(): string
     {
         $container = System::getContainer();
         $values = [];
@@ -48,7 +43,7 @@ class NodePickerWidget extends Widget
         // Can be an array
         if (!empty($this->varValue) && null !== ($nodes = NodeModel::findMultipleByIds((array) $this->varValue))) {
             /** @var DataContainerListener $eventListener */
-            $eventListener = $container->get('terminal42_node.listener.data_container');
+            $eventListener = $container->get(DataContainerListener::class);
 
             /** @var NodeModel $node */
             foreach ($nodes as $node) {
@@ -106,18 +101,15 @@ class NodePickerWidget extends Widget
         return '<div>'.$return.'</div></div>';
     }
 
-    /**
-     * Return an array if the "multiple" attribute is set.
-     */
-    protected function validator($input)
+    protected function validator(mixed $varInput): array|int|string
     {
-        $this->checkValue($input);
+        $this->checkValue($varInput);
 
         if ($this->hasErrors()) {
             return '';
         }
 
-        if (!$input) {
+        if (!$varInput) {
             if ($this->mandatory) {
                 $this->addError(\sprintf($GLOBALS['TL_LANG']['ERR']['mandatory'], $this->strLabel));
             }
@@ -125,21 +117,16 @@ class NodePickerWidget extends Widget
             return '';
         }
 
-        if (!str_contains($input, ',')) {
-            return $this->multiple ? [(int) $input] : (int) $input;
+        if (!str_contains((string) $varInput, ',')) {
+            return $this->multiple ? [(int) $varInput] : (int) $varInput;
         }
 
-        $value = array_map('intval', array_filter(explode(',', $input)));
+        $value = array_map('intval', array_filter(explode(',', (string) $varInput)));
 
         return $this->multiple ? $value : $value[0];
     }
 
-    /**
-     * Check the selected value.
-     *
-     * @param string $input
-     */
-    protected function checkValue($input): void
+    protected function checkValue(string $input): void
     {
         if ('' === $input || !\is_array($this->rootNodes)) {
             return;

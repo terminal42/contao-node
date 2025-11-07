@@ -10,9 +10,6 @@ use Contao\Model\Collection;
 
 class NodeModel extends Model
 {
-    /**
-     * Types.
-     */
     public const TYPE_CONTENT = 'content';
 
     public const TYPE_FOLDER = 'folder';
@@ -25,8 +22,6 @@ class NodeModel extends Model
     protected static $strTable = 'tl_node';
 
     /**
-     * Get the content elements.
-     *
      * @return Collection<ContentModel>|null
      */
     public function getContentElements(): Collection|null

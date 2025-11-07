@@ -25,17 +25,21 @@
         "source": "https://github.com/terminal42/contao-node"
     },
     "require": {
-        "php": "^8.0",
-        "contao/core-bundle": "^4.13 || ^5.0",
-        "codefog/contao-haste": "^4.21 || ^5.0",
+        "php": "^8.1",
+        "contao/core-bundle": "^5.3",
+        "codefog/contao-haste": "^5.2",
         "codefog/tags-bundle": "^3.3",
-        "doctrine/dbal": "^3.3 || ^4.0",
+        "doctrine/dbal": "^3.3 || ^4.3",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "symfony/config": "^5.0 || ^6.0 || ^7.0",
         "symfony/dependency-injection": "^5.0 || ^6.0 || ^7.0",
         "symfony/http-foundation": "^5.0 || ^6.0 || ^7.0",
         "symfony/http-kernel": "^5.0 || ^6.0 || ^7.0",
-        "symfony/security-core": "^5.0 || ^6.0 || ^7.0"
+        "symfony/security-core": "^5.0 || ^6.0 || ^7.0",
+        "symfony/security-bundle": "^5.0 || ^6.0 || ^7.0",
+        "symfony/service-contracts": "^3.0",
+        "symfony/translation-contracts": "^3.0",
+        "twig/twig": "^3.0"
     },
     "require-dev": {
         "terminal42/contao-geoip2-country": "^1.4",

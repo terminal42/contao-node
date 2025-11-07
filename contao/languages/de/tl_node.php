@@ -4,6 +4,7 @@ use Terminal42\NodeBundle\Model\NodeModel;
 
 $GLOBALS['TL_LANG']['tl_node']['name'] = ['Name', 'Bitte einen internen Namen des Nodes vergeben.'];
 $GLOBALS['TL_LANG']['tl_node']['type'] = ['Typ', 'Hier können Sie den Typ des Nodes auswählen.'];
+$GLOBALS['TL_LANG']['tl_node']['alias'] = ['Node-Alias', 'Hier können Sie das Node-Alias eingeben, welches zur Referenzierung des Knotens über ein Insert-Tag verwendet werden kann.'];
 $GLOBALS['TL_LANG']['tl_node']['wrapper'] = ['Wrapper hinzufügen', 'Hier können Sie einen Wrapper um diesen Node ausgeben.'];
 $GLOBALS['TL_LANG']['tl_node']['cssID'] = ['CSS-ID/Klasse', 'Hier können Sie eine ID und beliebig viele Klassen eingeben.'];
 $GLOBALS['TL_LANG']['tl_node']['nodeTpl'] = ['Node-Template', 'Hier können Sie ein Node-Template auswählen.'];
@@ -13,7 +14,6 @@ $GLOBALS['TL_LANG']['tl_node']['pid'] = ['Parent node'];
 $GLOBALS['TL_LANG']['tl_node']['tstamp'] = ['Revision date'];
 $GLOBALS['TL_LANG']['tl_node']['protected'] = ['Node schützen', 'Den node nur bestimmten Mitgliedergruppen anzeigen.'];
 $GLOBALS['TL_LANG']['tl_node']['groups'] = ['Erlaubte Mitgliedergruppen', 'Diese Gruppen können den Node sehen.'];
-$GLOBALS['TL_LANG']['tl_node']['guests'] = ['Nur Gästen anzeigen', 'Den Node verstecken, sobald ein Mitglied angemeldet ist.'];
 $GLOBALS['TL_LANG']['tl_node']['geoip_visibility'] = ['IP Geolokalisierung', 'Diesen Node für Besucher aus gewissen Ländern ein- oder ausblenden.'];
 $GLOBALS['TL_LANG']['tl_node']['geoip_countries'] = ['Länder', 'Wählen Sie die Länder welche diesen Node (nicht) sehen dürfen.'];
 

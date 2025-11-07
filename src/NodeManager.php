@@ -6,96 +6,112 @@ namespace Terminal42\NodeBundle;
 
 use Contao\ContentModel;
 use Contao\Controller;
-use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Terminal42\NodeBundle\Model\NodeModel;
+use Twig\Environment;
 
 class NodeManager
 {
-    /**
-     * Generate single node.
-     */
-    public function generateSingle(int $id): string|null
+    public function __construct(private readonly Environment $twig)
     {
-        if (!$id) {
+    }
+
+    public function generateSingle(int|string $idOrAlias): string|null
+    {
+        if (!$idOrAlias) {
             return null;
         }
 
-        if (null === ($nodeModel = NodeModel::findOneBy(['id=?', 'type=?'], [$id, NodeModel::TYPE_CONTENT]))) {
+        if (null === ($nodeModel = NodeModel::findOneBy(['(id=? OR alias=?)', 'type=?'], [$idOrAlias, $idOrAlias, NodeModel::TYPE_CONTENT]))) {
             return null;
         }
 
         return $this->generateBuffer($nodeModel);
     }
 
-    /**
-     * Generate multiple nodes.
-     */
-    public function generateMultiple(array $ids): array
+    public function generateMultiple(array $idsOrAliases): array
     {
-        $ids = array_filter($ids);
+        $idsOrAliases = array_values(array_filter($idsOrAliases));
 
-        if (0 === \count($ids)) {
+        if ([] === $idsOrAliases) {
             return [];
         }
 
-        $ids = array_map('intval', $ids);
+        $aliases = array_values(array_filter($idsOrAliases, static fn ($v) => \is_string($v) && !is_numeric($v)));
+        $ids = array_map(intval(...), array_values(array_diff($idsOrAliases, $aliases)));
 
-        $nodeModels = NodeModel::findBy(
-            ['id IN ('.implode(',', $ids).')', 'type=?'],
-            [NodeModel::TYPE_CONTENT, implode(',', $ids)],
-            ['order' => 'FIND_IN_SET(`id`, ?)'],
-        );
-
-        if (null === $nodeModels) {
+        if ([] === $aliases && [] === $ids) {
             return [];
+        }
+
+        $columns = ['type=?'];
+        $values = [NodeModel::TYPE_CONTENT];
+
+        if ([] !== $aliases) {
+            $columns[] = "alias IN ('".implode("','", $aliases)."')";
+        }
+
+        if ([] !== $ids) {
+            $columns[] = 'id IN ('.implode(',', $ids).')';
+        }
+
+        if (null === ($nodeModels = NodeModel::findBy($columns, $values))) {
+            return [];
+        }
+
+        $sortedNodeModels = [];
+
+        /** @var NodeModel $nodeModel */
+        foreach ($nodeModels as $nodeModel) {
+            // No strict check here
+            $sortedNodeModels[array_search($nodeModel->alias ?: $nodeModel->id, $idsOrAliases, false)] = $nodeModel;
         }
 
         $nodes = [];
 
         /** @var NodeModel $nodeModel */
-        foreach ($nodeModels as $nodeModel) {
+        foreach ($sortedNodeModels as $nodeModel) {
             $nodes[$nodeModel->id] = $this->generateBuffer($nodeModel);
         }
 
-        return array_filter($nodes, static fn ($buffer) => null !== $buffer);
+        return array_filter($nodes, static fn ($buffer) => '' !== $buffer);
     }
 
-    /**
-     * Generate the node buffer (content elements).
-     */
     private function generateBuffer(NodeModel $nodeModel): string
     {
         if (!Controller::isVisibleElement($nodeModel)) {
             return '';
         }
 
-        $buffer = '';
-        $elementsData = [];
+        $nodeElements = [];
 
         if (null !== ($elements = $nodeModel->getContentElements())) {
             /** @var ContentModel $element */
             foreach ($elements as $index => $element) {
-                $elementsData[] = $element->row();
+                // Keep the index if somebody wants to refer that inside the generated content element
                 $element->nodeElementIndex = $index;
-                $buffer .= Controller::getContentElement($element);
+
+                $nodeElements[] = new NodeElement($element->row(), Controller::getContentElement($element));
             }
         }
 
         if (!$nodeModel->wrapper) {
-            return $buffer;
+            return implode('', array_map(static fn (NodeElement $v) => $v->getRenderedHtml(), $nodeElements));
         }
-
-        $template = new FrontendTemplate($nodeModel->nodeTpl ?: 'node_default');
-        $template->setData($nodeModel->row());
-        $template->elementsData = $elementsData;
 
         $cssID = StringUtil::deserialize($nodeModel->cssID, true);
 
-        $template->class = !empty($cssID[1]) ? $cssID[1] : '';
-        $template->cssID = !empty($cssID[0]) ? $cssID[0] : '';
-        $template->buffer = $buffer;
+        if ($nodeModel->nodeTpl) {
+            $templateName = \sprintf('@Contao/%s.html.twig', $nodeModel->nodeTpl);
+        } else {
+            $templateName = '@Contao/node/default.html.twig';
+        }
 
-        return $template->parse();
+        return $this->twig->render($templateName, [
+            ...$nodeModel->row(),
+            'elements' => $nodeElements,
+            'class' => !empty($cssID[1]) ? $cssID[1] : '',
+            'cssID' => !empty($cssID[0]) ? $cssID[0] : '',
+        ]);
     }
 }
