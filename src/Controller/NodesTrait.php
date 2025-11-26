@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Terminal42\NodeBundle\Controller;
 
 use Contao\ContentModel;
+use Contao\CoreBundle\String\HtmlAttributes;
 use Contao\CoreBundle\Twig\FragmentTemplate;
 use Contao\Model;
 use Contao\ModuleModel;
@@ -43,7 +44,20 @@ trait NodesTrait
         }
 
         $template->set('nodes', $nodes);
-        $template->set('nodes_wrapper', (bool) $model->nodesWrapper);
+
+        // Add the nodes wrapper and its attributes
+        if ($model->nodesWrapper) {
+            $cssId = StringUtil::deserialize($model->cssID);
+            $wrapperAttributes = new HtmlAttributes();
+
+            if (is_array($cssId) && !empty($cssId)) {
+                $wrapperAttributes->addClass($cssId[1] ?? '');
+                $wrapperAttributes->setIfExists('id', $cssId[0] ?? '');
+            }
+
+            $template->set('nodes_wrapper', true);
+            $template->set('nodes_wrapper_attributes', $wrapperAttributes);
+        }
 
         return $template->getResponse();
     }

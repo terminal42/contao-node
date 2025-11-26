@@ -2,6 +2,8 @@
 
 {% block wrapper %}
     {% if nodes_wrapper ?? false %}
+        {% set attributes = attrs(attributes|default).mergeWith(nodes_wrapper_attributes) %}
+
         <{% block wrapper_tag %}div{% endblock %}{% block attributes %}{{ attributes }}{% endblock %}>
     {% endif %}
 
