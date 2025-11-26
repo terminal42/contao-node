@@ -6,6 +6,7 @@ namespace Terminal42\NodeBundle\InsertTag;
 
 use Contao\CoreBundle\DependencyInjection\Attribute\AsInsertTag;
 use Contao\CoreBundle\InsertTag\InsertTagResult;
+use Contao\CoreBundle\InsertTag\OutputType;
 use Contao\CoreBundle\InsertTag\ResolvedInsertTag;
 use Contao\CoreBundle\InsertTag\Resolver\InsertTagResolverNestedResolvedInterface;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -42,7 +43,7 @@ class NodeInsertTag implements InsertTagResolverNestedResolvedInterface
                 return new InsertTagResult('');
             }
 
-            return new InsertTagResult($buffer);
+            return new InsertTagResult($buffer, OutputType::html);
         }
 
         $nodes = $this->manager->generateMultiple($ids);
@@ -52,7 +53,7 @@ class NodeInsertTag implements InsertTagResolverNestedResolvedInterface
             $this->logError($insertTag, $invalid);
         }
 
-        return new InsertTagResult(implode("\n", $nodes));
+        return new InsertTagResult(implode("\n", $nodes), OutputType::html);
     }
 
     private function logError(ResolvedInsertTag $insertTag, array $ids): void
