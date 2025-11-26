@@ -68,12 +68,12 @@ class NodePermissionVoter extends AbstractDataContainerVoter
         if (null === $action->getNewPid()) {
             $nodeIds = $this->getNodeMounts($token);
         } else {
-            $nodeIds = [(int) $action->getNewPid()];
+            $nodeIds = [$action->getNewPid()];
         }
 
         // To create a record, the edit permissions must be available.
         foreach ($nodeIds as $nodeId) {
-            if ($this->canEdit($token, $nodeId)) {
+            if ($this->canEdit($token, (string) $nodeId)) {
                 return true;
             }
         }
