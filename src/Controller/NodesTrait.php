@@ -50,7 +50,7 @@ trait NodesTrait
             $cssId = StringUtil::deserialize($model->cssID);
             $wrapperAttributes = new HtmlAttributes();
 
-            if (is_array($cssId) && !empty($cssId)) {
+            if (!empty($cssId) && \is_array($cssId)) {
                 $wrapperAttributes->addClass($cssId[1] ?? '');
                 $wrapperAttributes->setIfExists('id', $cssId[0] ?? '');
             }
