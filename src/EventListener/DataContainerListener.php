@@ -70,7 +70,7 @@ class DataContainerListener
         $disablePI = false;
 
         // Disable all buttons if there is a circular reference
-        if (false !== $clipboard && (('cut' === $clipboard['mode'] && ($cr || (int) $clipboard['id'] === (int) $row['id'])) || ('cutAll' === $clipboard['mode'] && ($cr || \in_array((int) $row['id'], array_map('intval', $clipboard['id']), true))))) {
+        if (false !== $clipboard && (('cut' === $clipboard['mode'] && ($cr || (int) $clipboard['id'] === (int) $row['id'])) || ('cutAll' === $clipboard['mode'] && ($cr || \in_array((int) $row['id'], array_map(intval(...), $clipboard['id']), true))))) {
             $disablePA = true;
             $disablePI = true;
         }

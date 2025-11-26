@@ -121,7 +121,7 @@ class NodePickerWidget extends Widget
             return $this->multiple ? [(int) $varInput] : (int) $varInput;
         }
 
-        $value = array_map('intval', array_filter(explode(',', (string) $varInput)));
+        $value = array_map(intval(...), array_filter(explode(',', (string) $varInput)));
 
         return $this->multiple ? $value : $value[0];
     }
@@ -135,7 +135,7 @@ class NodePickerWidget extends Widget
         if (!str_contains($input, ',')) {
             $ids = [(int) $input];
         } else {
-            $ids = array_map('intval', array_filter(explode(',', $input)));
+            $ids = array_map(intval(...), array_filter(explode(',', $input)));
         }
 
         if (\count(array_diff($ids, array_merge($this->rootNodes, Database::getInstance()->getChildRecords($this->rootNodes, 'tl_node')))) > 0) {

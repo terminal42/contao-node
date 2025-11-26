@@ -26,7 +26,7 @@ class NodePickerProvider extends AbstractPickerProvider implements DcaPickerProv
         }
 
         if ($this->supportsValue($config)) {
-            $attributes['value'] = array_map('intval', explode(',', $config->getValue()));
+            $attributes['value'] = array_map(intval(...), explode(',', $config->getValue()));
         }
 
         if (\is_array($rootNodes = $config->getExtra('rootNodes'))) {

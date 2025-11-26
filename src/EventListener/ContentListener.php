@@ -20,7 +20,7 @@ class ContentListener
     public function onNodesSaveCallback(string|null $value, DataContainer $dc): string|null
     {
         $ids = (array) StringUtil::deserialize($value, true);
-        $ids = array_map('intval', $ids);
+        $ids = array_map(intval(...), $ids);
 
         if (\count($ids) > 0) {
             $folders = $this->connection->fetchAllAssociative('SELECT name FROM tl_node WHERE id IN ('.implode(', ', $ids).') AND type=?', [NodeModel::TYPE_FOLDER]);
@@ -30,7 +30,7 @@ class ContentListener
                 throw new \InvalidArgumentException(\sprintf($GLOBALS['TL_LANG']['ERR']['invalidNodes'], implode(', ', array_column($folders, 'name'))));
             }
 
-            $ids = array_map('intval', $ids);
+            $ids = array_map(intval(...), $ids);
 
             // Check for potential circular reference
             if ('tl_node' === ($dc->activeRecord->ptable ?? null) && \in_array((int) $dc->activeRecord->pid, $ids, true)) {
