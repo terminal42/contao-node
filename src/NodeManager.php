@@ -67,6 +67,8 @@ class NodeManager
             $sortedNodeModels[array_search($nodeModel->alias ?: $nodeModel->id, $idsOrAliases, false)] = $nodeModel;
         }
 
+        ksort($sortedNodeModels);
+
         $nodes = [];
 
         /** @var NodeModel $nodeModel */
