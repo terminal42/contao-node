@@ -3,8 +3,8 @@
 use Contao\Controller;
 use Contao\System;
 
-Controller::loadDataContainer('tl_content');
 System::loadLanguageFile('tl_content');
+Controller::loadDataContainer('tl_content');
 
 // Palettes
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'nodesWrapper';
