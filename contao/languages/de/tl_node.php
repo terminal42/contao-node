@@ -34,6 +34,11 @@ $GLOBALS['TL_LANG']['tl_node']['typeRef'] = [
 ];
 
 /*
+ * Backend search
+ */
+$GLOBALS['TL_LANG']['tl_node']['tableLabel'] = 'Node';
+
+/*
  * Buttons
  */
 $GLOBALS['TL_LANG']['tl_node']['new'] = ['Neuer Node', 'Neuen Node erzeugen'];
