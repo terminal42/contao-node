@@ -144,7 +144,7 @@ class NodePermissionVoter extends AbstractDataContainerVoter
     {
         $user = $token->getUser();
 
-        if (!$user instanceof BackendUser) {
+        if (!$user instanceof BackendUser || !is_array($user->nodeMounts)) {
             return [];
         }
 
